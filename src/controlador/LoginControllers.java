@@ -38,7 +38,7 @@ public class LoginControllers implements ActionListener{
                 String clave = String.valueOf(views.txtClave.getPassword());
                 us = usDao.login(usuario, clave);
                 if (us.getUsuario() != null) {
-                    PanelAdmin admin = new PanelAdmin();
+                    PanelAdmin admin = new PanelAdmin(us.getId(), us.getNombre());
                     admin.setVisible(true);
                     this.views.dispose();
                 }else{

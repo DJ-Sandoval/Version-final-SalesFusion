@@ -3,6 +3,8 @@ package vista;
 
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import controlador.LoginControllers;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -16,6 +18,8 @@ import modelo.Usuarios;
 public class Login extends javax.swing.JFrame {
     Usuarios us = new Usuarios();
     UsuarioDao usDao = new UsuarioDao();
+    int xMouse;
+    int yMouse;
     /**
      * Creates new form Login
      */
@@ -25,8 +29,28 @@ public class Login extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
         this.setSize(392, 467);
         LoginControllers users = new LoginControllers(us, usDao, this);
+        ImageIcon icon = new ImageIcon(getClass().getResource("/img/iniciar-sesion.png"));
+        setIconImage(icon.getImage());
         
         // Establecer un icono a login
+         // Agrega un listener de mouse para permitir el arrastre de la ventana
+        addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                xMouse = e.getX();
+                yMouse = e.getY();
+            }
+        });
+        
+        
+        addMouseMotionListener(new MouseAdapter() {
+            public void mouseDragged(MouseEvent e) {
+                int x = e.getXOnScreen() - xMouse;
+                int y = e.getYOnScreen() - yMouse;
+
+                setLocation(x, y);
+            }
+        });
+        
     }
     
     // Metodo especial pata icono

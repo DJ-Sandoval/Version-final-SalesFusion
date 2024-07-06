@@ -65,7 +65,7 @@ public class CajasController implements ActionListener, MouseListener, KeyListen
         this.views.JMenuReingresarCaja.addActionListener(this);
         this.views.jMenuIEditarCaja.addActionListener(this);
         this.views.TableCaja.addMouseListener(this);
-        this.views.btnCajaCt.addActionListener(this);
+        //this.views.btnCajaCt.addActionListener(this);
         this.apC.btnAbrirApertura.addActionListener(this);
         this.views.btnCerrarCaja.addActionListener(this);
         //llenarCategoria();
@@ -92,7 +92,7 @@ public class CajasController implements ActionListener, MouseListener, KeyListen
         } else if (e.getSource() == views.jMenuIEditarCaja) {
            editarCaja();
         } else if (e.getSource() == views.btnCajaCt) {
-            views.jTabbedPane1.setSelectedIndex(13);
+            views.jTabbedPane1.setSelectedIndex(10);
             limpiarTable();
             listarCajas();
         }

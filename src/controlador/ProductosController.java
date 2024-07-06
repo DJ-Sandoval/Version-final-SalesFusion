@@ -90,6 +90,8 @@ public class ProductosController implements ActionListener, MouseListener, KeyLi
         this.views.txtBuscarProducto.addKeyListener(this);
         this.views.txtCodNV.addKeyListener(this);
         this.views.txtCantNV.addKeyListener(this);
+        this.views.txtPagarCon.addKeyListener(this);
+        this.views.txtBuscarProducto.addKeyListener(this);
         //proDao.generarReporte(1);
         listarProductos();
         llenarProveedor();
@@ -437,7 +439,32 @@ public class ProductosController implements ActionListener, MouseListener, KeyLi
                 double total = Double.parseDouble(views.JLabelTotalCompra.getText());
                 views.txtVueltoCompra.setText(""+ (pagar - total));
             }
-        }
+        } else if (e.getSource() == views.txtBuscarProducto) {
+            views.jTabbedPane1.setSelectedIndex(0);
+            limpiarTable();
+            listarProductos();
+        } else if (e.getSource() == views.txtCantNV) {
+            int cantidad;
+            double precio;
+            if (views.txtCantNV.getText().equals("")) {
+                cantidad = 1;
+                precio = Double.parseDouble(views.txtPrecioNV.getText());
+                views.txtTotalNV.setText(""+precio);
+            } else {
+                cantidad = Integer.parseInt(views.txtCantNV.getText());
+                precio = Double.parseDouble(views.txtPrecioNV.getText());
+                views.txtTotalNV.setText(""+cantidad*precio);
+            }  
+        } else if (e.getSource() == views.txtPagarCon) {
+            int pagar;
+            if (views.txtPagarCon.getText().equals("")) {
+                views.txtVuelto.setText("");
+            } else {
+                pagar = Integer.parseInt(views.txtPagarCon.getText());
+                double total = Double.parseDouble(views.JLabelTotalPagar.getText());
+                views.txtVuelto.setText(""+ (pagar - total));
+            }
+        } 
     }
     
     
@@ -654,6 +681,14 @@ public class ProductosController implements ActionListener, MouseListener, KeyLi
             limpiarTableDetalle();
             JOptionPane.showMessageDialog(null, "Venta generada", "Confirmacion", JOptionPane.INFORMATION_MESSAGE);
             proDao.generarticketVenta(id);
+            views.txtProductoNV.setText("");
+            views.txtCantNV.setText("");
+            views.txtTotalNV.setText("");
+            views.txtStockNV.setText("");
+            views.txtIdNV.setText("");
+            views.txtPagarCon.setText("");
+            views.txtVuelto.setText("");
+            views.JLabelTotalPagar.setText("00.00");
 //proDao.generarReporte(id);
 //                
         }

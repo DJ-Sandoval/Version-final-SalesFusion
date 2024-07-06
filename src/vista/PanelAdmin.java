@@ -139,6 +139,9 @@ public class PanelAdmin extends javax.swing.JFrame {
      * Creates new form PanelAdmin
      */
     public PanelAdmin() {
+        
+    }
+    public PanelAdmin(int id, String nombre) {
         initComponents();
         jTabbedPane1.setEnabled(false);
         TableVentas.fixTable(jScrollPane1);
@@ -329,6 +332,9 @@ public class PanelAdmin extends javax.swing.JFrame {
         //Proveedor
         //
 
+    
+        txtIdUsuario.setText("" + id);
+        btnUser.setText(nombre);
     }
     
 
@@ -393,6 +399,8 @@ public class PanelAdmin extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jScrollPane11 = new javax.swing.JScrollPane();
         TableProductos = new Table.TableDark();
+        btnEliminarProducto = new controlador.MyButton();
+        myButton4 = new controlador.MyButton();
         jPanel3 = new javax.swing.JPanel();
         PaginadorCli = new javax.swing.JPanel();
         btnRegistrarCli = new controlador.MyButton();
@@ -401,6 +409,8 @@ public class PanelAdmin extends javax.swing.JFrame {
         jLabel8 = new javax.swing.JLabel();
         jScrollPane15 = new javax.swing.JScrollPane();
         TableClientes = new Table.TableDark();
+        btnEliminarCliente = new controlador.MyButton();
+        myButton3 = new controlador.MyButton();
         jPanel4 = new javax.swing.JPanel();
         PaginadoProv = new javax.swing.JPanel();
         txtBuscarProv = new controlador.MyTextField();
@@ -465,6 +475,7 @@ public class PanelAdmin extends javax.swing.JFrame {
         btnHistorialVentas = new controlador.MyButton();
         txtBuscarVenta = new controlador.MyTextField();
         txtIdVenta = new controlador.MyTextField();
+        jButton1 = new javax.swing.JButton();
         jPanel10 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         TableCompras = new Table.TableDark();
@@ -472,6 +483,7 @@ public class PanelAdmin extends javax.swing.JFrame {
         btnHistorialCompras = new controlador.MyButton();
         btnEliminarCompra = new controlador.MyButton();
         txtIdCompra = new controlador.MyTextField();
+        myButton1 = new controlador.MyButton();
         jPanel11 = new javax.swing.JPanel();
         jPanel17 = new javax.swing.JPanel();
         jLabel40 = new javax.swing.JLabel();
@@ -714,6 +726,29 @@ public class PanelAdmin extends javax.swing.JFrame {
 
         jPanel2.add(jScrollPane11, new org.netbeans.lib.awtextra.AbsoluteConstraints(22, 87, 1040, 420));
 
+        btnEliminarProducto.setForeground(new java.awt.Color(0, 0, 0));
+        btnEliminarProducto.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/eliminar-base-de-datos.png"))); // NOI18N
+        btnEliminarProducto.setText("Eliminar");
+        btnEliminarProducto.setBorderColor(new java.awt.Color(30, 30, 30));
+        btnEliminarProducto.setColorClick(new java.awt.Color(21, 21, 21));
+        btnEliminarProducto.setColorOver(new java.awt.Color(255, 255, 255));
+        btnEliminarProducto.setFont(new java.awt.Font("SansSerif", 1, 14)); // NOI18N
+        jPanel2.add(btnEliminarProducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 30, -1, -1));
+
+        myButton4.setForeground(new java.awt.Color(0, 0, 0));
+        myButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/boton-de-inicio.png"))); // NOI18N
+        myButton4.setText("Volver");
+        myButton4.setBorderColor(new java.awt.Color(30, 30, 30));
+        myButton4.setColorClick(new java.awt.Color(21, 21, 21));
+        myButton4.setColorOver(new java.awt.Color(255, 255, 255));
+        myButton4.setFont(new java.awt.Font("SansSerif", 1, 14)); // NOI18N
+        myButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                myButton4ActionPerformed(evt);
+            }
+        });
+        jPanel2.add(myButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 30, -1, -1));
+
         jTabbedPane1.addTab("Productos", jPanel2);
 
         jPanel3.setBackground(new java.awt.Color(0, 123, 167));
@@ -781,6 +816,29 @@ public class PanelAdmin extends javax.swing.JFrame {
         jScrollPane15.setViewportView(TableClientes);
 
         jPanel3.add(jScrollPane15, new org.netbeans.lib.awtextra.AbsoluteConstraints(22, 77, 1050, 430));
+
+        btnEliminarCliente.setForeground(new java.awt.Color(0, 0, 0));
+        btnEliminarCliente.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/eliminar-base-de-datos.png"))); // NOI18N
+        btnEliminarCliente.setText("Eliminar");
+        btnEliminarCliente.setBorderColor(new java.awt.Color(30, 30, 30));
+        btnEliminarCliente.setColorClick(new java.awt.Color(21, 21, 21));
+        btnEliminarCliente.setColorOver(new java.awt.Color(255, 255, 255));
+        btnEliminarCliente.setFont(new java.awt.Font("SansSerif", 1, 14)); // NOI18N
+        jPanel3.add(btnEliminarCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, 30, -1, -1));
+
+        myButton3.setForeground(new java.awt.Color(0, 0, 0));
+        myButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/boton-de-inicio.png"))); // NOI18N
+        myButton3.setText("Volver");
+        myButton3.setBorderColor(new java.awt.Color(30, 30, 30));
+        myButton3.setColorClick(new java.awt.Color(21, 21, 21));
+        myButton3.setColorOver(new java.awt.Color(255, 255, 255));
+        myButton3.setFont(new java.awt.Font("SansSerif", 1, 14)); // NOI18N
+        myButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                myButton3ActionPerformed(evt);
+            }
+        });
+        jPanel3.add(myButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 30, -1, -1));
 
         jTabbedPane1.addTab("Cliente", jPanel3);
 
@@ -1103,14 +1161,14 @@ public class PanelAdmin extends javax.swing.JFrame {
 
         jLabel27.setFont(new java.awt.Font("SansSerif", 1, 14)); // NOI18N
         jLabel27.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel27.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/bolsa-de-dinero.png"))); // NOI18N
+        jLabel27.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/tot.png"))); // NOI18N
         jLabel27.setText("Total Pagar");
-        jPanel8.add(jLabel27, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 520, -1, -1));
+        jPanel8.add(jLabel27, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, 520, -1, -1));
 
-        JLabelTotalPagar.setFont(new java.awt.Font("SansSerif", 1, 14)); // NOI18N
+        JLabelTotalPagar.setFont(new java.awt.Font("SansSerif", 1, 16)); // NOI18N
         JLabelTotalPagar.setForeground(new java.awt.Color(0, 0, 0));
-        JLabelTotalPagar.setText("-------");
-        jPanel8.add(JLabelTotalPagar, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 520, -1, -1));
+        JLabelTotalPagar.setText("00.00");
+        jPanel8.add(JLabelTotalPagar, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 530, -1, -1));
 
         jLabel33.setFont(new java.awt.Font("SansSerif", 1, 14)); // NOI18N
         jLabel33.setForeground(new java.awt.Color(0, 0, 0));
@@ -1154,6 +1212,11 @@ public class PanelAdmin extends javax.swing.JFrame {
         btnCajaCt.setColorClick(new java.awt.Color(21, 21, 21));
         btnCajaCt.setColorOver(new java.awt.Color(255, 255, 255));
         btnCajaCt.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        btnCajaCt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCajaCtActionPerformed(evt);
+            }
+        });
         jPanel8.add(btnCajaCt, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 40, -1, -1));
 
         jTabbedPane1.addTab("Nueva Venta", jPanel8);
@@ -1221,6 +1284,19 @@ public class PanelAdmin extends javax.swing.JFrame {
         txtIdVenta.setPrefixIcon(new javax.swing.ImageIcon(getClass().getResource("/img/id-insignia.png"))); // NOI18N
         jPanel9.add(txtIdVenta, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 40, 120, 35));
 
+        jButton1.setBackground(new java.awt.Color(255, 255, 255));
+        jButton1.setFont(new java.awt.Font("SansSerif", 1, 14)); // NOI18N
+        jButton1.setForeground(new java.awt.Color(0, 0, 0));
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/boton-de-inicio.png"))); // NOI18N
+        jButton1.setText("Volver");
+        jButton1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(30, 30, 30)));
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        jPanel9.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 40, 120, 50));
+
         jTabbedPane1.addTab("Venta", jPanel9);
 
         jPanel10.setBackground(new java.awt.Color(0, 123, 167));
@@ -1268,6 +1344,20 @@ public class PanelAdmin extends javax.swing.JFrame {
         txtIdCompra.setBackground(new java.awt.Color(30, 30, 30));
         txtIdCompra.setPrefixIcon(new javax.swing.ImageIcon(getClass().getResource("/img/id-insignia.png"))); // NOI18N
         jPanel10.add(txtIdCompra, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 35, 130, 30));
+
+        myButton1.setForeground(new java.awt.Color(0, 0, 0));
+        myButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/boton-de-inicio.png"))); // NOI18N
+        myButton1.setText("Volver");
+        myButton1.setBorderColor(new java.awt.Color(30, 30, 30));
+        myButton1.setColorClick(new java.awt.Color(21, 21, 21));
+        myButton1.setColorOver(new java.awt.Color(255, 255, 255));
+        myButton1.setFont(new java.awt.Font("SansSerif", 1, 14)); // NOI18N
+        myButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                myButton1ActionPerformed(evt);
+            }
+        });
+        jPanel10.add(myButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 20, -1, 50));
 
         jTabbedPane1.addTab("Compras", jPanel10);
 
@@ -1587,11 +1677,11 @@ public class PanelAdmin extends javax.swing.JFrame {
         jPanel14.add(jLabel39, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 20, -1, -1));
 
         btnGenerarCompra.setBackground(new java.awt.Color(255, 255, 255));
-        btnGenerarCompra.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
+        btnGenerarCompra.setFont(new java.awt.Font("SansSerif", 1, 14)); // NOI18N
         btnGenerarCompra.setForeground(new java.awt.Color(0, 0, 0));
-        btnGenerarCompra.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/carro.png"))); // NOI18N
-        btnGenerarCompra.setText("Generar Compra");
-        jPanel14.add(btnGenerarCompra, new org.netbeans.lib.awtextra.AbsoluteConstraints(880, 50, 170, 40));
+        btnGenerarCompra.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/GenerarCompra.png"))); // NOI18N
+        btnGenerarCompra.setText("Generar");
+        jPanel14.add(btnGenerarCompra, new org.netbeans.lib.awtextra.AbsoluteConstraints(880, 50, 130, 40));
 
         jLabel41.setFont(new java.awt.Font("SansSerif", 1, 14)); // NOI18N
         jLabel41.setForeground(new java.awt.Color(0, 0, 0));
@@ -1616,12 +1706,13 @@ public class PanelAdmin extends javax.swing.JFrame {
         txtVueltoCompra.setBackground(new java.awt.Color(255, 255, 255));
         txtVueltoCompra.setFont(new java.awt.Font("SansSerif", 1, 14)); // NOI18N
         txtVueltoCompra.setForeground(new java.awt.Color(0, 0, 0));
-        jPanel14.add(txtVueltoCompra, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 500, 150, 30));
+        jPanel14.add(txtVueltoCompra, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 500, 150, 30));
 
         jLabel42.setFont(new java.awt.Font("SansSerif", 1, 14)); // NOI18N
         jLabel42.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel42.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/tot.png"))); // NOI18N
         jLabel42.setText("Total Pagar");
-        jPanel14.add(jLabel42, new org.netbeans.lib.awtextra.AbsoluteConstraints(890, 500, -1, -1));
+        jPanel14.add(jLabel42, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 500, -1, -1));
 
         JLabelTotalCompra.setFont(new java.awt.Font("SansSerif", 1, 14)); // NOI18N
         JLabelTotalCompra.setForeground(new java.awt.Color(0, 0, 0));
@@ -1636,7 +1727,7 @@ public class PanelAdmin extends javax.swing.JFrame {
         jLabel44.setFont(new java.awt.Font("SansSerif", 1, 14)); // NOI18N
         jLabel44.setForeground(new java.awt.Color(0, 0, 0));
         jLabel44.setText("Vuelto");
-        jPanel14.add(jLabel44, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 500, -1, -1));
+        jPanel14.add(jLabel44, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 500, -1, -1));
 
         jLabel67.setFont(new java.awt.Font("SansSerif", 1, 14)); // NOI18N
         jLabel67.setForeground(new java.awt.Color(0, 0, 0));
@@ -1672,6 +1763,11 @@ public class PanelAdmin extends javax.swing.JFrame {
         contenedorProductos.setRoundBottomRight(50);
         contenedorProductos.setRoundTopLeft(50);
         contenedorProductos.setRoundTopRight(50);
+        contenedorProductos.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                contenedorProductosMouseClicked(evt);
+            }
+        });
 
         jLabel65.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel65.setForeground(new java.awt.Color(255, 255, 255));
@@ -1716,6 +1812,11 @@ public class PanelAdmin extends javax.swing.JFrame {
         contenedorCompras.setRoundBottomRight(50);
         contenedorCompras.setRoundTopLeft(50);
         contenedorCompras.setRoundTopRight(50);
+        contenedorCompras.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                contenedorComprasMouseClicked(evt);
+            }
+        });
 
         jLabel15.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel15.setForeground(new java.awt.Color(255, 255, 255));
@@ -1760,6 +1861,11 @@ public class PanelAdmin extends javax.swing.JFrame {
         contenedroClientes.setRoundBottomRight(50);
         contenedroClientes.setRoundTopLeft(50);
         contenedroClientes.setRoundTopRight(50);
+        contenedroClientes.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                contenedroClientesMouseClicked(evt);
+            }
+        });
 
         jLabel68.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel68.setForeground(new java.awt.Color(255, 255, 255));
@@ -1804,6 +1910,11 @@ public class PanelAdmin extends javax.swing.JFrame {
         ContenedorVentas.setRoundBottomRight(50);
         ContenedorVentas.setRoundTopLeft(50);
         ContenedorVentas.setRoundTopRight(50);
+        ContenedorVentas.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                ContenedorVentasMouseClicked(evt);
+            }
+        });
 
         jLabel70.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel70.setForeground(new java.awt.Color(255, 255, 255));
@@ -2170,6 +2281,69 @@ public class PanelAdmin extends javax.swing.JFrame {
         cajaAbierta.setVisible(true);
     }//GEN-LAST:event_btnAbrirCajaActionPerformed
 
+    private void btnCajaCtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCajaCtActionPerformed
+         CajasController cajas = new CajasController(caja, cjDao, this, cajaNuevo, cajaModificada, usuario, usuarioModificado, cajaAbierta);
+        PanelAdmin.this.jTabbedPane1.setSelectedIndex(10);
+        cajas.limpiarTable();
+        cajas.listarAperturas();
+    }//GEN-LAST:event_btnCajaCtActionPerformed
+
+    private void contenedorComprasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_contenedorComprasMouseClicked
+        PanelAdmin.this.jTabbedPane1.setSelectedIndex(8);
+    }//GEN-LAST:event_contenedorComprasMouseClicked
+
+    private void contenedorProductosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_contenedorProductosMouseClicked
+        PanelAdmin.this.jTabbedPane1.setSelectedIndex(0);
+    }//GEN-LAST:event_contenedorProductosMouseClicked
+
+    private void contenedroClientesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_contenedroClientesMouseClicked
+        PanelAdmin.this.jTabbedPane1.setSelectedIndex(1);
+    }//GEN-LAST:event_contenedroClientesMouseClicked
+
+    private void ContenedorVentasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ContenedorVentasMouseClicked
+        PanelAdmin.this.jTabbedPane1.setSelectedIndex(7);
+    }//GEN-LAST:event_ContenedorVentasMouseClicked
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        ProductosDao productosDao = new ProductosDao();
+        PanelAdmin.this.jTabbedPane1.setSelectedIndex(12);
+        Map<String, Integer> datosVentas = productosDao.obtenerProductosMasVendidos();
+        refrescarContenedores();
+        llenarTablaBajoStock(TableBajoStock, 50);
+        //new PieChartExample(data, panelGrafica);
+        setVisible(true);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void myButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_myButton1ActionPerformed
+        ProductosDao productosDao = new ProductosDao();
+        PanelAdmin.this.jTabbedPane1.setSelectedIndex(12);
+        Map<String, Integer> datosVentas = productosDao.obtenerProductosMasVendidos();
+        refrescarContenedores();
+        llenarTablaBajoStock(TableBajoStock, 50);
+        //new PieChartExample(data, panelGrafica);
+        setVisible(true);
+    }//GEN-LAST:event_myButton1ActionPerformed
+
+    private void myButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_myButton3ActionPerformed
+        ProductosDao productosDao = new ProductosDao();
+        PanelAdmin.this.jTabbedPane1.setSelectedIndex(12);
+        Map<String, Integer> datosVentas = productosDao.obtenerProductosMasVendidos();
+        refrescarContenedores();
+        llenarTablaBajoStock(TableBajoStock, 50);
+        //new PieChartExample(data, panelGrafica);
+        setVisible(true);
+    }//GEN-LAST:event_myButton3ActionPerformed
+
+    private void myButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_myButton4ActionPerformed
+        ProductosDao productosDao = new ProductosDao();
+        PanelAdmin.this.jTabbedPane1.setSelectedIndex(12);
+        Map<String, Integer> datosVentas = productosDao.obtenerProductosMasVendidos();
+        refrescarContenedores();
+        llenarTablaBajoStock(TableBajoStock, 50);
+        //new PieChartExample(data, panelGrafica);
+        setVisible(true);
+    }//GEN-LAST:event_myButton4ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -2256,7 +2430,9 @@ public class PanelAdmin extends javax.swing.JFrame {
     public controlador.MyButton btnCajaCt;
     public controlador.MyButton btnCerrarCaja;
     public controlador.MyButton btnEliminarApertura;
+    private controlador.MyButton btnEliminarCliente;
     public controlador.MyButton btnEliminarCompra;
+    private controlador.MyButton btnEliminarProducto;
     public controlador.MyButton btnEliminarVenta;
     public javax.swing.JButton btnGenerarCompra;
     public javax.swing.JButton btnGenerarVenta;
@@ -2277,6 +2453,7 @@ public class PanelAdmin extends javax.swing.JFrame {
     public controlador.PanelRound contenedorCompras;
     public controlador.PanelRound contenedorProductos;
     public controlador.PanelRound contenedroClientes;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel15;
@@ -2374,6 +2551,9 @@ public class PanelAdmin extends javax.swing.JFrame {
     private javax.swing.JLabel lblGraficas;
     private javax.swing.JLabel lblHora;
     private controlador.Menu menu;
+    private controlador.MyButton myButton1;
+    private controlador.MyButton myButton3;
+    private controlador.MyButton myButton4;
     private javax.swing.JPanel pnChart;
     public controlador.MyTextField txtBuscarApertura;
     public controlador.MyTextField txtBuscarCaja;
