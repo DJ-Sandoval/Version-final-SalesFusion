@@ -10,6 +10,7 @@ import com.itextpdf.text.Font;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
@@ -175,27 +176,38 @@ public class ProductosDao {
     }
 
     // Método para obtener la cantidad de productos por categoría
-    public Map<String, Integer> obtenerCantidadPorCategoria() {
+   public Map<String, Integer> obtenerProductosMasVendidos() {
         Map<String, Integer> datos = new HashMap<>();
-        String sql = "SELECT c.categoria, COUNT(p.id) AS cantidad FROM productos p "
-                + "INNER JOIN categorias c ON p.id_categoria = c.id "
-                + "GROUP BY c.categoria";
+        String sql = "SELECT p.descripcion AS producto, SUM(dv.cantidad) AS cantidad "
+                + "FROM detalle_ventas dv "
+                + "INNER JOIN productos p ON dv.id_producto = p.id "
+                + "GROUP BY p.descripcion "
+                + "ORDER BY cantidad DESC";
         try {
             con = cn.getConexion();
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
             while (rs.next()) {
-                datos.put(rs.getString("categoria"), rs.getInt("cantidad"));
+                datos.put(rs.getString("producto"), rs.getInt("cantidad"));
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e.toString());
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
+                if (con != null) con.close();
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, e.toString());
+            }
         }
         return datos;
     }
 
+
     // Modulo compras
      public Productos buscarCodigo(String codigo) {
-        String sql = "SELECT * FROM productos WHERE codigo = ?";
+        String sql = "SELECT * FROM productos WHERE codigo = ? AND estado = 'Activo'";
         Productos prod = new Productos();
         try {
             con = cn.getConexion();
@@ -206,6 +218,8 @@ public class ProductosDao {
                 prod.setId(rs.getInt("id"));
                 prod.setDescripcion(rs.getString("descripcion"));
                 prod.setPrecio_compra(rs.getDouble("precio_compra"));
+                prod.setPrecio_venta(rs.getDouble("precio_venta"));
+                prod.setCantidad(rs.getInt("cantidad"));
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
@@ -319,9 +333,9 @@ public class ProductosDao {
         }
     }
     
-    public int id_compra() {
+    public int getUltimoId(String tabla) {
         int id = 0;
-        String sql = "SELECT MAX(id) AS id FROM compras";
+        String sql = "SELECT MAX(id) AS id FROM " + tabla;
         try {
             con = cn.getConexion();
             ps = con.prepareStatement(sql);
@@ -564,4 +578,464 @@ public class ProductosDao {
        }
        
     }
+    
+    // Modulo de ventas
+    public boolean registrarVenta(int id, String total, int id_user) {
+        String sql = "INSERT INTO ventas (id_cliente, total, id_user) VALUES (?,?,?)";
+        try {
+            con = cn.getConexion();
+            ps = con.prepareStatement(sql);
+            ps.setInt(1, id);
+            ps.setString(2, total);
+            ps.setInt(3, id_user);
+            ps.execute();
+            return true;
+        } catch (SQLException e) {
+           JOptionPane.showMessageDialog(null, e.getMessage());
+           return false;
+        }
+    }
+    
+     // Registrar detalle de venta
+     public boolean registrarVentaDetalle(int id_venta, int id_producto, double precio, int cant, double sub_total) {
+        String sql = "INSERT INTO detalle_ventas (id_venta, id_producto, precio, cantidad, subtotal) VALUES (?,?,?,?,?)";
+        try {
+            con = cn.getConexion();
+            ps = con.prepareStatement(sql);
+            ps.setInt(1, id_venta);
+            ps.setInt(2, id_producto);
+            ps.setDouble(3, precio);
+            ps.setInt(4, cant);
+            ps.setDouble(5, sub_total);
+            ps.execute();
+            return true;
+        } catch (SQLException e) {
+           JOptionPane.showMessageDialog(null, e.getMessage());
+           return false;
+        }
+    }
+     
+      public void generarReporteVenta(int id_venta) {
+       double totalGeneral = 0.00;
+       String fecha = "";
+       String nombreCliente = "";
+       String direCliente = "";
+       String teleCliente = "";
+       String mensaje = "";
+       
+       try {
+           // Agregando un font ala letra
+           Font negrita = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.BOLD, BaseColor.WHITE);
+          String url = FileSystemView.getFileSystemView().getDefaultDirectory().getPath();
+          FileOutputStream archivo ;
+          File salida = new File(url + File.separator + "venta.pdf");
+          archivo = new FileOutputStream(salida);
+          Document doc = new Document();
+          PdfWriter.getInstance(doc, archivo);
+          doc.open();
+          // Contenido de reporte
+          PdfPTable empresa = new PdfPTable(4);
+          empresa.setWidthPercentage(100);
+          float[] tamanioEncabezado = new float[]{15f, 15f, 40f, 30f};
+          empresa.setWidths(tamanioEncabezado);
+          empresa.setHorizontalAlignment(Element.ALIGN_LEFT);
+          empresa.getDefaultCell().setBorder(0);
+          // Capturar y agregar Logotipo
+          Image img = Image.getInstance(getClass().getResource("/img/ReporteProv.png"));
+          empresa.addCell(img);
+          empresa.addCell("");
+          
+           // Consulta los datos de la empresa
+           String sql = "SELECT * FROM configuracion";
+           try {
+               con = cn.getConexion();
+               ps = con.prepareStatement(sql);
+               rs = ps.executeQuery();
+               if (rs.next()) {
+                   mensaje = rs.getString("mensaje");
+                   // Agregar los datos de la empresa
+                   empresa.addCell("Rfc: " + rs.getString("rfc") + "\nNombre: " + rs.getString("nombre")
+                   + "\nTelefono: " + rs.getString("telefono") + "\nDireccion: " + rs.getString("direccion")
+                   + "\nCodigoPostal: " + rs.getString("codigoPostal"));
+               }
+           } catch (SQLException e) {
+               JOptionPane.showMessageDialog(null, e.toString());
+           }
+           // Consulta los datos de cliente
+           String consultaCliente = "SELECT c.nombre, c.telefono, c.direccion, v.total, v.fecha FROM ventas v INNER JOIN clientes c ON v.id_cliente = c.id WHERE v.id = " + id_venta;
+           try {
+               con = cn.getConexion();
+               ps = con.prepareStatement(consultaCliente);
+               rs = ps.executeQuery();
+               if (rs.next()) {
+                   // Agregar los datos del cliente
+                   nombreCliente = rs.getString("nombre");
+                   direCliente = rs.getString("telefono");
+                   teleCliente = rs.getString("direccion");
+                   totalGeneral = rs.getDouble("total");
+                   fecha = rs.getString("fecha");
+               }
+           } catch (SQLException e) {
+               JOptionPane.showMessageDialog(null, e.toString());
+           }       
+           
+           
+           
+           
+           
+          // Datos del vendedor
+          empresa.addCell("Nº Venta: " + id_venta + "\nVendedor: " + "Fernando"
+                  + "\nFecha: " + fecha);
+          
+          doc.add(empresa);
+          // Fin de datos de empresa
+          doc.add(Chunk.NEWLINE);
+          
+          // Titulo Cliente
+          Paragraph titCliente = new Paragraph();
+          titCliente.add("Datos del cliente");
+          titCliente.setAlignment(Element.ALIGN_CENTER);
+          doc.add(titCliente);
+          doc.add(Chunk.NEWLINE);
+          
+          
+          
+           // Mostrar datos del cliente
+           PdfPTable cliente = new PdfPTable(3);
+           cliente.setWidthPercentage(100);
+           float[] tamanioCliente = new float[]{40f, 20f, 40f};
+           cliente.setWidths(tamanioCliente);
+           cliente.setHorizontalAlignment(Element.ALIGN_LEFT);
+           cliente.getDefaultCell().setBorder(0);
+           // Encabezado Cliente
+           PdfPCell nomCli = new PdfPCell(new Phrase("Nombre", negrita));
+           PdfPCell telCli = new PdfPCell(new Phrase("Telefono", negrita));
+           PdfPCell direCli = new PdfPCell(new Phrase("Direccion", negrita));
+           
+           // Eliminar bordes de los encabezados
+           nomCli.setBorder(0);
+           telCli.setBorder(0);
+           direCli.setBorder(0);
+           
+           // Color de fondo del encabezado
+           nomCli.setBackgroundColor(BaseColor.DARK_GRAY);
+           telCli.setBackgroundColor(BaseColor.DARK_GRAY);
+           direCli.setBackgroundColor(BaseColor.DARK_GRAY);
+           
+           // Agregar los encabezados del cliente
+           
+           cliente.addCell(nomCli);
+           cliente.addCell(telCli);
+           cliente.addCell(direCli);
+           
+           
+           // Agregar datos del cliente
+           cliente.addCell(nombreCliente);
+           cliente.addCell(teleCliente);
+           cliente.addCell(direCliente);
+           
+          doc.add(cliente);
+          // fin cliente
+          doc.add(Chunk.NEWLINE);
+          
+          // Titulo Productos
+          Paragraph titProductos = new Paragraph();
+          titProductos.add("Detalles de la venta");
+          titProductos.setAlignment(Element.ALIGN_CENTER);
+          doc.add(titProductos);
+          doc.add(Chunk.NEWLINE);
+          
+          // Mostrar productos
+           PdfPTable producto = new PdfPTable(4);
+           producto.setWidthPercentage(100);
+           float[] tamanioProducto = new float[]{50f, 10f, 20f, 20f};
+           producto.setWidths(tamanioProducto);
+           producto.setHorizontalAlignment(Element.ALIGN_LEFT);
+           producto.getDefaultCell().setBorder(0);
+           // Encabezado de Productos
+           PdfPCell desPro = new PdfPCell(new Phrase("Descripcion", negrita));
+           PdfPCell cantPro = new PdfPCell(new Phrase("Cantidad", negrita));
+           PdfPCell precioPro = new PdfPCell(new Phrase("Precio", negrita));
+           PdfPCell subPro= new PdfPCell(new Phrase("SubTotal", negrita));
+           
+           // Eliminar bordes de los encabezados
+           desPro.setBorder(0);
+           cantPro.setBorder(0);
+           precioPro.setBorder(0);
+           subPro.setBorder(0);
+           
+           // Color de fondo del encabezado
+           desPro.setBackgroundColor(BaseColor.DARK_GRAY);
+           cantPro.setBackgroundColor(BaseColor.DARK_GRAY);
+           precioPro.setBackgroundColor(BaseColor.DARK_GRAY);
+           subPro.setBackgroundColor(BaseColor.DARK_GRAY);
+           
+           // Agregar los encabezados del producto
+           producto.addCell(desPro);
+           producto.addCell(cantPro);
+           producto.addCell(precioPro);
+           producto.addCell(subPro);
+           
+           // Consulta de datos de productos
+           String consultaProductos = "SELECT d.precio, d.cantidad, d.subtotal, p.descripcion FROM ventas v INNER JOIN detalle_ventas d ON v.id = d.id_venta INNER JOIN productos p ON d.id_producto = p.id WHERE v.id = " + id_venta;
+           try {
+               con = cn.getConexion();
+               ps = con.prepareStatement(consultaProductos);
+               rs = ps.executeQuery();
+               while (rs.next()) {
+                   // Agregar los datos del producto
+                   producto.addCell(rs.getString("descripcion"));
+                   producto.addCell(rs.getString("cantidad"));
+                   producto.addCell(rs.getString("precio"));
+                   producto.addCell(rs.getString("subtotal"));
+               }
+           } catch (SQLException e) {
+               JOptionPane.showMessageDialog(null, e.toString());
+           }
+
+           doc.add(producto);
+           doc.add(Chunk.NEWLINE);
+           // Fin detalle productos
+           // Mostrar total a pagar
+           Paragraph total = new Paragraph();
+           total.add("Total a pagar: " + totalGeneral);
+           total.setAlignment(Element.ALIGN_RIGHT);
+           doc.add(total);
+           doc.add(Chunk.NEWLINE);
+
+           // Mostrar mensaje
+           Paragraph agradecimiento = new Paragraph();
+           agradecimiento.add(mensaje);
+           agradecimiento.setAlignment(Element.ALIGN_CENTER);
+           doc.add(agradecimiento);
+           doc.add(Chunk.NEWLINE);
+           
+           // Cerrar Archivo
+           doc.close();
+          archivo.close();
+          Desktop.getDesktop().open(salida);
+       } catch (DocumentException | HeadlessException | IOException e) {
+           
+       }
+       
+    }
+      
+     
+    public void generarticketVenta(int id_venta) {
+    double totalGeneral = 0.00;
+    String fecha = "";
+    String nombreCliente = "";
+    String direCliente = "";
+    String teleCliente = "";
+    String mensaje = "";
+
+    try {
+        // Agregando un font a la letra
+        Font negrita = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.BOLD, BaseColor.WHITE);
+        String url = FileSystemView.getFileSystemView().getDefaultDirectory().getPath();
+        FileOutputStream archivo;
+        File salida = new File(url + File.separator + "venta.pdf");
+        archivo = new FileOutputStream(salida);
+        
+        // Configurar el tamaño del documento al de un ticket
+        Rectangle pageSize = new Rectangle(226, 14400); // 80mm de ancho, altura ajustable
+        Document doc = new Document(pageSize, 10, 10, 10, 10); // Establecer márgenes pequeños
+        
+        PdfWriter.getInstance(doc, archivo);
+        doc.open();
+        
+        // Contenido de reporte
+        PdfPTable empresa = new PdfPTable(4);
+        empresa.setWidthPercentage(100);
+        float[] tamanioEncabezado = new float[]{20f, 5f, 45f, 30f}; // Ajustar proporciones
+        empresa.setWidths(tamanioEncabezado);
+        empresa.setHorizontalAlignment(Element.ALIGN_LEFT);
+        empresa.getDefaultCell().setBorder(0);
+        
+        // Capturar y agregar Logotipo
+        Image img = Image.getInstance(getClass().getResource("/img/46.jpg"));
+        img.scaleToFit(50, 50); // Ajustar tamaño de imagen
+        empresa.addCell(img);
+        empresa.addCell("");
+        
+        // Consulta los datos de la empresa
+        String sql = "SELECT * FROM configuracion";
+        try {
+            con = cn.getConexion();
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                mensaje = rs.getString("mensaje");
+                // Agregar los datos de la empresa
+                empresa.addCell("Rfc: " + rs.getString("rfc") + "\nNombre: " + rs.getString("nombre")
+                + "\nTelefono: " + rs.getString("telefono") + "\nDireccion: " + rs.getString("direccion")
+                + "\nCodigoPostal: " + rs.getString("codigoPostal"));
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e.toString());
+        }
+
+        // Consulta los datos de cliente
+        String consultaCliente = "SELECT c.nombre, c.telefono, c.direccion, v.total, v.fecha FROM ventas v INNER JOIN clientes c ON v.id_cliente = c.id WHERE v.id = " + id_venta;
+        try {
+            con = cn.getConexion();
+            ps = con.prepareStatement(consultaCliente);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                // Agregar los datos del cliente
+                nombreCliente = rs.getString("nombre");
+                teleCliente = rs.getString("telefono");
+                direCliente = rs.getString("direccion");
+                totalGeneral = rs.getDouble("total");
+                fecha = rs.getString("fecha");
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e.toString());
+        }
+
+        // Datos del vendedor
+        empresa.addCell("Nº Venta: " + id_venta + "\nVendedor: " + "Fernando"
+                + "\nFecha: " + fecha);
+
+        doc.add(empresa);
+        // Fin de datos de empresa
+        doc.add(Chunk.NEWLINE);
+
+        // Titulo Cliente
+        Paragraph titCliente = new Paragraph();
+        titCliente.add("Datos del cliente");
+        titCliente.setAlignment(Element.ALIGN_CENTER);
+        doc.add(titCliente);
+        doc.add(Chunk.NEWLINE);
+
+        // Mostrar datos del cliente
+        PdfPTable cliente = new PdfPTable(3);
+        cliente.setWidthPercentage(100);
+        float[] tamanioCliente = new float[]{40f, 30f, 30f}; // Ajustar proporciones
+        cliente.setWidths(tamanioCliente);
+        cliente.setHorizontalAlignment(Element.ALIGN_LEFT);
+        cliente.getDefaultCell().setBorder(0);
+        // Encabezado Cliente
+        PdfPCell nomCli = new PdfPCell(new Phrase("Nombre", negrita));
+        PdfPCell telCli = new PdfPCell(new Phrase("Telefono", negrita));
+        PdfPCell direCli = new PdfPCell(new Phrase("Direccion", negrita));
+
+        // Eliminar bordes de los encabezados
+        nomCli.setBorder(0);
+        telCli.setBorder(0);
+        direCli.setBorder(0);
+
+        // Color de fondo del encabezado
+        nomCli.setBackgroundColor(BaseColor.DARK_GRAY);
+        telCli.setBackgroundColor(BaseColor.DARK_GRAY);
+        direCli.setBackgroundColor(BaseColor.DARK_GRAY);
+
+        // Agregar los encabezados del cliente
+        cliente.addCell(nomCli);
+        cliente.addCell(telCli);
+        cliente.addCell(direCli);
+
+        // Agregar datos del cliente
+        cliente.addCell(nombreCliente);
+        cliente.addCell(teleCliente);
+        cliente.addCell(direCliente);
+
+        doc.add(cliente);
+        // fin cliente
+        doc.add(Chunk.NEWLINE);
+
+        // Titulo Productos
+        Paragraph titProductos = new Paragraph();
+        titProductos.add("Detalles de la venta");
+        titProductos.setAlignment(Element.ALIGN_CENTER);
+        doc.add(titProductos);
+        doc.add(Chunk.NEWLINE);
+
+        // Mostrar productos
+        PdfPTable producto = new PdfPTable(4);
+        producto.setWidthPercentage(100);
+        float[] tamanioProducto = new float[]{40f, 20f, 20f, 20f}; // Ajustar proporciones
+        producto.setWidths(tamanioProducto);
+        producto.setHorizontalAlignment(Element.ALIGN_LEFT);
+        producto.getDefaultCell().setBorder(0);
+        // Encabezado de Productos
+        PdfPCell desPro = new PdfPCell(new Phrase("Descripcion", negrita));
+        PdfPCell cantPro = new PdfPCell(new Phrase("Cant", negrita));
+        PdfPCell precioPro = new PdfPCell(new Phrase("Precio", negrita));
+        PdfPCell subPro= new PdfPCell(new Phrase("SubT", negrita));
+
+        // Eliminar bordes de los encabezados
+        desPro.setBorder(0);
+        cantPro.setBorder(0);
+        precioPro.setBorder(0);
+        subPro.setBorder(0);
+
+        // Color de fondo del encabezado
+        desPro.setBackgroundColor(BaseColor.DARK_GRAY);
+        cantPro.setBackgroundColor(BaseColor.DARK_GRAY);
+        precioPro.setBackgroundColor(BaseColor.DARK_GRAY);
+        subPro.setBackgroundColor(BaseColor.DARK_GRAY);
+
+        // Agregar los encabezados del producto
+        producto.addCell(desPro);
+        producto.addCell(cantPro);
+        producto.addCell(precioPro);
+        producto.addCell(subPro);
+
+        // Consulta de datos de productos
+        String consultaProductos = "SELECT d.precio, d.cantidad, d.subtotal, p.descripcion FROM ventas v INNER JOIN detalle_ventas d ON v.id = d.id_venta INNER JOIN productos p ON d.id_producto = p.id WHERE v.id = " + id_venta;
+        try {
+            con = cn.getConexion();
+            ps = con.prepareStatement(consultaProductos);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                // Agregar los datos del producto
+                producto.addCell(rs.getString("descripcion"));
+                producto.addCell(rs.getString("cantidad"));
+                producto.addCell(rs.getString("precio"));
+                producto.addCell(rs.getString("subtotal"));
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e.toString());
+        }
+
+        doc.add(producto);
+        doc.add(Chunk.NEWLINE);
+        // Fin detalle productos
+
+        // Mostrar total a pagar
+        Paragraph total = new Paragraph();
+        total.add("Total a pagar: " + totalGeneral);
+        total.setAlignment(Element.ALIGN_RIGHT);
+        doc.add(total);
+        doc.add(Chunk.NEWLINE);
+
+        // Mostrar mensaje
+        Paragraph agradecimiento = new Paragraph();
+        agradecimiento.add(mensaje);
+        agradecimiento.setAlignment(Element.ALIGN_CENTER);
+        doc.add(agradecimiento);
+        doc.add(Chunk.NEWLINE);
+
+        // Agregar leyenda final
+        Paragraph leyenda = new Paragraph();
+        leyenda.add("Conserve su ticket para cualquier aclaración");
+        leyenda.add("\nSalesFusion POS V3.3");
+        leyenda.setAlignment(Element.ALIGN_CENTER);
+        doc.add(leyenda);
+        doc.add(Chunk.NEWLINE);
+
+        // Cerrar Archivo
+        doc.close();
+        archivo.close();
+        Desktop.getDesktop().open(salida);
+    } catch (DocumentException | HeadlessException | IOException e) {
+        JOptionPane.showMessageDialog(null, e.toString());
+    }
+     }
+
+
+
+    
+   
 }

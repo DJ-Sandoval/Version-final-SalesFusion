@@ -109,7 +109,20 @@ public class ContenedoresController implements ActionListener, MouseListener {
        }
     }
     // Metodo para contar Ventas
-    
+    public void contarVentas() {
+        String sql = "SELECT COUNT(*) AS total_registro FROM ventas";
+        try {
+            con = cn.getConexion();
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                int totalRegistros = rs.getInt("total_registro");
+                vista.ConteoVentas(totalRegistros);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
     
 
 }

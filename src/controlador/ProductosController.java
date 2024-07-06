@@ -20,6 +20,11 @@ import modelo.ProductosDao;
 import modelo.Tables;
 import vista.PanelAdmin;
 import controlador.ProveedorController;
+import java.awt.Cursor;
+import java.awt.event.WindowAdapter;
+import javax.swing.JLabel;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 import modelo.Categorias;
 import modelo.MedidaDao;
 import modelo.Medidas;
@@ -29,7 +34,11 @@ import vista.frmNuevoProducto;
 import vista.frmModificarProducto;
 import modelo.MedidaDao;
 import modelo.CategoriaDao;
+import modelo.Clientes;
 import vista.FrmActualizarStock;
+import modelo.ClientesDao;
+import modelo.ventasDao;
+import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 /**
  *
@@ -46,6 +55,7 @@ public class ProductosController implements ActionListener, MouseListener, KeyLi
     private MedidaDao mdDao;
     private CategoriaDao ctDao;
     private FrmActualizarStock stockAc;
+    private ClientesDao cliDao;
     //private ProveedorController provC;
     
     
@@ -54,7 +64,7 @@ public class ProductosController implements ActionListener, MouseListener, KeyLi
     DefaultTableModel tmp;
 
     // Constructor con isntancias
-    public ProductosController(ProveedorDao prDao, Productos prod, ProductosDao proDao, PanelAdmin views, frmNuevoProducto productoNuevo, frmModificarProducto productoModificado, MedidaDao mdDao, CategoriaDao ctDao, FrmActualizarStock stockAc) {
+    public ProductosController(ProveedorDao prDao, Productos prod, ProductosDao proDao, PanelAdmin views, frmNuevoProducto productoNuevo, frmModificarProducto productoModificado, MedidaDao mdDao, CategoriaDao ctDao, FrmActualizarStock stockAc, ClientesDao cliDao) {
         this.prod = prod;
         this.proDao = proDao;
         this.views = views;
@@ -64,26 +74,33 @@ public class ProductosController implements ActionListener, MouseListener, KeyLi
         this.mdDao = mdDao;
         this.ctDao = ctDao;
         this.stockAc = stockAc;
+        this.cliDao = cliDao;
         this.stockAc.btnActualizarStock.addActionListener(this);
         this.productoNuevo.btnRegistrarPro.addActionListener(this);
         this.productoModificado.btnModificarPro.addActionListener(this);
         this.views.JMenuEliminarProd.addActionListener(this);
         this.views.JMenuReingresarProd.addActionListener(this);
-        this.views.TableProductos.addMouseListener(this); 
+        this.views.jMenuIEditarProd.addActionListener(this);
+        this.views.TableProductos.addMouseListener(this);
         this.views.txtCodNC.addKeyListener(this);
         this.views.txtCantNC.addKeyListener(this);
         this.views.txtPagarConNC.addKeyListener(this);
         this.views.btnGenerarCompra.addActionListener(this);
+        this.views.btnGenerarVenta.addActionListener(this);
+        this.views.txtBuscarProducto.addKeyListener(this);
+        this.views.txtCodNV.addKeyListener(this);
+        this.views.txtCantNV.addKeyListener(this);
         //proDao.generarReporte(1);
         listarProductos();
         llenarProveedor();
         llenarMedida();
         llenarCategoria();
+        
+       
     }
     
     // Metodos de accion
-    
-     @Override
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == productoNuevo.btnRegistrarPro) {
             if (productoNuevo.txtCodigoPro.getText().equals("")
@@ -92,7 +109,7 @@ public class ProductosController implements ActionListener, MouseListener, KeyLi
                     || productoNuevo.txtPrecioVentaPro.getText().equals("")
                     || productoNuevo.cbxProveedorPr.getSelectedItem().equals("")
                     || productoNuevo.cbxCategoriaPro.getSelectedItem().equals("")
-                    || productoNuevo.cbxMedidaPro.getSelectedItem().equals("")){                
+                    || productoNuevo.cbxMedidaPro.getSelectedItem().equals("")) {
                 JOptionPane.showMessageDialog(null, "no dejes ESPACIOS EN BLANCO");
             } else {
                 prod.setCodigo(productoNuevo.txtCodigoPro.getText());
@@ -104,18 +121,17 @@ public class ProductosController implements ActionListener, MouseListener, KeyLi
                 Combo itemM = (Combo) productoNuevo.cbxMedidaPro.getSelectedItem();
                 prod.setId_proveedor(itemP.getId());
                 prod.setId_categoria(itemC.getId());
-                prod.setId_medida(itemM.getId());               
+                prod.setId_medida(itemM.getId());
                 if (proDao.registrar(prod)) {
                     limpiarTable();
                     listarProductos();
-                    
                     JOptionPane.showMessageDialog(null, "Producto Registrado con exito");
                     productoNuevo.dispose();
                     limpiar();
                 } else {
                     JOptionPane.showMessageDialog(null, "Error al registrar el producto");
                 }
-            }          
+            }
         } else if (e.getSource() == productoModificado.btnModificarPro) {
             if (productoModificado.txtCodigoPro.getText().equals("")
                     || productoModificado.txtDescripcionPro.getText().equals("")
@@ -123,7 +139,7 @@ public class ProductosController implements ActionListener, MouseListener, KeyLi
                     || productoModificado.txtPrecioVentaPro.getText().equals("")
                     || productoModificado.cbxProveedorPr.getSelectedItem().equals("")
                     || productoModificado.cbxCategoriaPro.getSelectedItem().equals("")
-                    || productoModificado.cbxMedidaPro.getSelectedItem().equals("")){     
+                    || productoModificado.cbxMedidaPro.getSelectedItem().equals("")) {
                 JOptionPane.showMessageDialog(null, "Selecciona una fila");
             } else {
                 prod.setCodigo(productoModificado.txtCodigoPro.getText());
@@ -140,7 +156,7 @@ public class ProductosController implements ActionListener, MouseListener, KeyLi
                 if (proDao.modificar(prod)) {
                     limpiarTable();
                     listarProductos();
-                    
+
                     JOptionPane.showMessageDialog(null, "Producto Modificado con exito");
                     productoModificado.dispose();
                     limpiar();
@@ -162,6 +178,13 @@ public class ProductosController implements ActionListener, MouseListener, KeyLi
                     JOptionPane.showMessageDialog(null, "Error al eliminar producto");
                 }
             }
+        } else if (e.getSource() == views.jMenuIEditarProd) {
+            if (views.txtIdProducto.getText().equals("")) {
+                JOptionPane.showMessageDialog(null, "Seleccione una fila para reingresar", "campo vacio", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                int id = Integer.parseInt(views.txtIdProducto.getText());
+                productoModificado.setVisible(true);
+            }
         } else if (e.getSource() == views.JMenuReingresarProd) {
             if (views.txtIdProducto.getText().equals("")) {
                 JOptionPane.showMessageDialog(null, "Seleccione una fila para reingresar");
@@ -175,68 +198,74 @@ public class ProductosController implements ActionListener, MouseListener, KeyLi
                 } else {
                     JOptionPane.showMessageDialog(null, "Error al reingresar producto");
                 }
-            
+
             }
         } else if (e.getSource() == stockAc.btnActualizarStock) {
             if (!stockAc.txtStockNuevo.getText().isEmpty()) {
-        // Validamos que el usuario no ingrese otros caracteres no numéricos no deseados
-        boolean validacion = validar(stockAc.txtStockNuevo.getText().trim());
-        if (validacion) {
-            // Validar que mi cantidad sea mayor que 0
-            if (Integer.parseInt(stockAc.txtStockNuevo.getText()) > 0) {
-                int stockActual = Integer.parseInt(stockAc.txtStockActual.getText().trim());
-                int stockNuevo = Integer.parseInt(stockAc.txtStockNuevo.getText().trim());
-                int nuevoStockTotal = stockActual + stockNuevo;
-                int idProducto = Integer.parseInt(stockAc.txtIdProductoStock.getText().trim());
+                // Validamos que el usuario no ingrese otros caracteres no numéricos no deseados
+                boolean validacion = validar(stockAc.txtStockNuevo.getText().trim());
+                if (validacion) {
+                    // Validar que mi cantidad sea mayor que 0
+                    if (Integer.parseInt(stockAc.txtStockNuevo.getText()) > 0) {
+                        int stockActual = Integer.parseInt(stockAc.txtStockActual.getText().trim());
+                        int stockNuevo = Integer.parseInt(stockAc.txtStockNuevo.getText().trim());
+                        int nuevoStockTotal = stockActual + stockNuevo;
+                        int idProducto = Integer.parseInt(stockAc.txtIdProductoStock.getText().trim());
 
-                if (proDao.actualizarStock(nuevoStockTotal, idProducto)) {
-                    DefaultTableModel modelo = (DefaultTableModel) views.TableProductos.getModel();
-                    
-                    // Actualiza la fila correspondiente
-                    int selectedRow = views.TableProductos.getSelectedRow();
-                    if (selectedRow != -1) {
-                        // Seleccionando la fila correspondiente de la tabla a actualizar
-                        modelo.setValueAt(nuevoStockTotal, selectedRow, 4);
-                        
-                        // Notifica que se ha actualizado una fila específica
-                        modelo.fireTableRowsUpdated(selectedRow, selectedRow);
+                        if (proDao.actualizarStock(nuevoStockTotal, idProducto)) {
+                            DefaultTableModel modelo = (DefaultTableModel) views.TableProductos.getModel();
+
+                            // Actualiza la fila correspondiente
+                            int selectedRow = views.TableProductos.getSelectedRow();
+                            if (selectedRow != -1) {
+                                // Seleccionando la fila correspondiente de la tabla a actualizar
+                                modelo.setValueAt(nuevoStockTotal, selectedRow, 4);
+
+                                // Notifica que se ha actualizado una fila específica
+                                modelo.fireTableRowsUpdated(selectedRow, selectedRow);
+                            }
+
+                            // Limpia y vuelve a listar productos
+                            limpiarTable();
+                            listarProductos();
+
+                            stockAc.txtIdProductoStock.setText("");
+                            stockAc.txtProductoStock.setText("");
+                            stockAc.txtStockActual.setText("");
+                            stockAc.txtStockNuevo.setText("");
+
+                            JOptionPane.showMessageDialog(null, "Stock Actualizado", "Información", JOptionPane.INFORMATION_MESSAGE);
+                            limpiarCompras();
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Error al actualizar stock", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Cantidad debe ser mayor que 0", "Error", JOptionPane.ERROR_MESSAGE);
                     }
-
-                    // Limpia y vuelve a listar productos
-                    limpiarTable();
-                    listarProductos();
-
-                    stockAc.txtIdProductoStock.setText("");
-                    stockAc.txtProductoStock.setText("");
-                    stockAc.txtStockActual.setText("");
-                    stockAc.txtStockNuevo.setText("");
-
-                    JOptionPane.showMessageDialog(null, "Stock Actualizado", "Información", JOptionPane.INFORMATION_MESSAGE);
-                    limpiarCampos();
                 } else {
-                    JOptionPane.showMessageDialog(null, "Error al actualizar stock", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Entrada inválida", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             } else {
-                JOptionPane.showMessageDialog(null, "Cantidad debe ser mayor que 0", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Campo de stock nuevo vacío", "Error", JOptionPane.ERROR_MESSAGE);
             }
-        } else {
-            JOptionPane.showMessageDialog(null, "Entrada inválida", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    } else {
-        JOptionPane.showMessageDialog(null, "Campo de stock nuevo vacío", "Error", JOptionPane.ERROR_MESSAGE);
-    }
-        }
-        
-        
-        else if (e.getSource() == views.btnGenerarCompra) {
+        } else if (e.getSource() == views.btnGenerarCompra) {
             insertarCompra();
+
+        } else if (e.getSource() == views.btnGenerarVenta) {
+            ventasDao vDao = new ventasDao();
+            String respuesta = vDao.verificarCaja(Integer.parseInt(views.txtIdUsuario.getText()));
+            if (respuesta.equals("existe")) {
+                insertarVenta();
+            } else if (respuesta.equals("no")) {
+                JOptionPane.showMessageDialog(null, "La caja esta cerrada", "CAJA CERRADA", JOptionPane.ERROR_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "ERROR FATAL", "Error", JOptionPane.ERROR_MESSAGE);
+            }
             
-        } else {
-        
         }
-        
+
     }
-    
+
     public void limpiarTableStock() {
     DefaultTableModel modelo = (DefaultTableModel) views.TableProductos.getModel();
     modelo.setRowCount(0);
@@ -296,7 +325,6 @@ public class ProductosController implements ActionListener, MouseListener, KeyLi
     // Metodos de Mouse
     @Override
     public void mouseClicked(MouseEvent e) {
-        
          if (e.getSource() == views.TableProductos) {
             int fila = views.TableProductos.rowAtPoint(e.getPoint());
             views.txtIdProducto.setText(views.TableProductos.getValueAt(fila, 0).toString());
@@ -307,8 +335,7 @@ public class ProductosController implements ActionListener, MouseListener, KeyLi
             productoModificado.txtPrecioVentaPro.setText(""+prod.getPrecio_venta());
             productoModificado.cbxProveedorPr.setSelectedItem(new Combo(prod.getId_proveedor(), prod.getProveedor()));
             productoModificado.cbxMedidaPro.setSelectedItem(new Combo(prod.getId_medida(), prod.getMedida()));
-            productoModificado.cbxCategoriaPro.setSelectedItem(new Combo(prod.getId_categoria(), prod.getCat()));  
-            productoModificado.setVisible(true);
+            productoModificado.cbxCategoriaPro.setSelectedItem(new Combo(prod.getId_categoria(), prod.getCat()));   
          }
     }
 
@@ -322,10 +349,16 @@ public class ProductosController implements ActionListener, MouseListener, KeyLi
 
     @Override
     public void mouseEntered(MouseEvent e) {
+        if (e.getSource() == views.txtCodNV) {
+            views.txtCodNV.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        }
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
+        if (e.getSource() == views.txtCodNV) {
+            views.txtCodNV.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+        }
     }
 
     // Metodos de Key
@@ -337,51 +370,45 @@ public class ProductosController implements ActionListener, MouseListener, KeyLi
     public void keyPressed(KeyEvent e) {
         if (e.getSource() == views.txtCodNC) {
             if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                if (views.txtCodNC.getText().equals("")) {
-                    JOptionPane.showMessageDialog(null, "Ingrese el codigo");
-                } else {
-                    String cod = views.txtCodNC.getText();
-                    prod = proDao.buscarCodigo(cod);
-                     views.txtIdNC.setText(""+prod.getId());
-                    views.txtProductoNC.setText(prod.getDescripcion());
-                    views.txtPrecioNC.setText(""+prod.getPrecio_compra());
-                    views.txtCantNC.requestFocus();
-                }
+               String cod = views.txtCodNC.getText();
+               buscarProducto(views.txtCodNC, cod, views.txtIdNC, views.txtProductoNC, views.txtPrecioNC, views.txtCantNC, 0);
             }
-        } else if (e.getSource() == views.txtCantNC) {
+        } // Buscar y agregar productos temp ala venta
+        else if (e.getSource() == views.txtCodNV) {
+            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+               String cod = views.txtCodNV.getText();
+               buscarProducto(views.txtCodNV, cod, views.txtIdNV, views.txtProductoNV, views.txtPrecioNV, views.txtCantNV, 1);
+            }
+        }
+        else if (e.getSource() == views.txtCantNC) {
             if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                 int cant = Integer.parseInt(views.txtCantNC.getText());
                 String desc = views.txtProductoNC.getText();
                 double precio = Double.parseDouble(views.txtPrecioNC.getText());
-                // Calcular el total
                 int id = Integer.parseInt(views.txtIdNC.getText());
-                if (cant > 0) {
-                    tmp = (DefaultTableModel) views.TableNuevaCompra.getModel();
-                    ArrayList lista = new ArrayList();
-                    int item = 1;
-                    lista.add(item);
-                    lista.add(id);
-                    lista.add(desc);
-                    lista.add(cant);
-                    lista.add(precio);
-                    lista.add(cant * precio);
-                    Object[] obj = new Object[5];
-                    obj[0] = lista.get(1);
-                    obj[1] = lista.get(2);
-                    obj[2] = lista.get(3);
-                    obj[3] = lista.get(4);
-                    obj[4] = lista.get(5);
-                    tmp.addRow(obj);
-                    views.TableNuevaCompra.setModel(tmp);
-                    JTableHeader header = views.TableNuevaCompra.getTableHeader();
-                    Font headerFont = new Font("SansSerif", Font.BOLD, 16);
-                    header.setOpaque(false);
-                    header.setBackground(new Color(30, 30, 30)); //16,49,114 0,81,135
-                    header.setForeground(new Color(255, 255, 255));
-                    header.setFont(headerFont);
-                    limpiarCampos();
-                    calcularCompra();
-                    views.txtCodNC.requestFocus();
+                AgregarTemp(cant, desc, precio, id, views.TableNuevaCompra, views.txtCodNC);
+                limpiarCompras();
+                calcularTotal(views.TableNuevaCompra, views.JLabelTotalCompra);
+            }
+        } else if (e.getSource() == views.txtCantNV) {
+            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                // Validamos si la cantidad no esta vacio
+                if (views.txtCantNV.getText().equals("")) {
+                     JOptionPane.showMessageDialog(null, "Ingrese la cantidad", "Campo Vacio", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    int cant = Integer.parseInt(views.txtCantNV.getText());
+                    int stock = Integer.parseInt(views.txtStockNV.getText());
+                    if (cant > stock) {
+                         JOptionPane.showMessageDialog(null, "Stock no disponible", "Error", JOptionPane.ERROR_MESSAGE);
+                        
+                    } else {
+                        String desc = views.txtProductoNV.getText();
+                        double precio = Double.parseDouble(views.txtPrecioNV.getText());
+                        int id = Integer.parseInt(views.txtIdNV.getText());
+                        AgregarTemp(cant, desc, precio, id, views.TableNuevaVenta, views.txtCodNV);
+                        limpiarVentas();
+                        calcularTotal(views.TableNuevaVenta, views.JLabelTotalPagar);
+                    }
                 }
             }
         }
@@ -412,8 +439,13 @@ public class ProductosController implements ActionListener, MouseListener, KeyLi
             }
         }
     }
+    
+    
+    
+    
+   
 
-    private void limpiarCampos() {
+    private void limpiarCompras() {
         views.txtCodNC.setText("");
         views.txtIdNC.setText("");
         views.txtProductoNC.setText("");
@@ -422,13 +454,23 @@ public class ProductosController implements ActionListener, MouseListener, KeyLi
         views.txtTotalNC.setText("");
     }
     
-    private void calcularCompra() {
+    private void limpiarVentas() {
+        views.txtCodNV.setText("");
+        views.txtIdNV.setText("");
+        views.txtProductoNV.setText("");
+        views.txtCantNV.setText("");
+        views.txtPrecioNV.setText("");
+        views.txtTotalNV.setText("");
+        views.txtStockNV.setText("");
+    }
+    
+    private void calcularTotal(JTable tabla, JLabel totalPagar) {
         double total = 0.00;
-        int numFila = views.TableNuevaCompra.getRowCount();
+        int numFila = tabla.getRowCount();
         for (int i = 0; i < numFila; i++) {
-            total = total + Double.parseDouble(String.valueOf(views.TableNuevaCompra.getValueAt(i, 4))); // String.valueof(views.tabla de comora)
+            total = total + Double.parseDouble(String.valueOf(tabla.getValueAt(i, 4))); // String.valueof(views.tabla de comora)
         }
-        views.JLabelTotalCompra.setText(""+ total);
+        totalPagar.setText(""+ total);
     }
     
     // Llenar los comboBox
@@ -463,12 +505,21 @@ public class ProductosController implements ActionListener, MouseListener, KeyLi
         }
     }
     
+    public void llenarCliente() {
+        List<Clientes> lista = cliDao.ListaCliente(views.txtBuscarCli.getText());
+        for (int i = 0; i < lista.size(); i++) {
+            int id = lista.get(i).getId();
+            String nombre = lista.get(i).getNombre();
+            views.cbxClientes.addItem(new Combo(id, nombre));
+        }
+    }
+    
     private void insertarCompra() {
         Combo id_p = (Combo) views.cbxProvNC.getSelectedItem();
         int id_proveedor = id_p.getId();
         String total = views.JLabelTotalCompra.getText();
         if (proDao.registrarCompra(id_proveedor, total)) {
-           int id_compra = proDao.id_compra();
+           int id_compra = proDao.getUltimoId("compras");
             for (int i = 0; i < views.TableNuevaCompra.getRowCount(); i++) {
                 double precio = Double.parseDouble(views.TableNuevaCompra.getValueAt(i, 3).toString());
                 int cantidad = Integer.parseInt(views.TableNuevaCompra.getValueAt(i, 2).toString());
@@ -527,11 +578,86 @@ public class ProductosController implements ActionListener, MouseListener, KeyLi
 
     
     
-        // Fuera del for
-    
+    // Agregar productos para la venta
+    private void AgregarTemp(int cant, String desc, double precio, int id, JTable tabla, JTextField codigo) {  
+        if (cant > 0) {
+            tmp = (DefaultTableModel) tabla.getModel();
+            ArrayList lista = new ArrayList();
+            int item = 1;
+            lista.add(item);
+            lista.add(id);
+            lista.add(desc);
+            lista.add(cant);
+            lista.add(precio);
+            lista.add(cant * precio);
+            Object[] obj = new Object[5];
+            obj[0] = lista.get(1);
+            obj[1] = lista.get(2);
+            obj[2] = lista.get(3);
+            obj[3] = lista.get(4);
+            obj[4] = lista.get(5);
+            tmp.addRow(obj);
+            tabla.setModel(tmp);
+            //JTableHeader header = views.TableNuevaCompra.getTableHeader();
+            //Font headerFont = new Font("SansSerif", Font.BOLD, 16);
+            //header.setOpaque(false);
+            //header.setBackground(new Color(30, 30, 30)); //16,49,114 0,81,135
+            //header.setForeground(new Color(255, 255, 255));
+           // header.setFont(headerFont);
+            codigo.requestFocus();
+        }
+
+    }
         
-    
-    
+    // Buscar productos compra y venta
+    private void buscarProducto(JTextField campo, String cod, JTextField id, JTextField producto,
+            JTextField precio, JTextField cant, int accion) {
+        if (campo.getText().equals("")) {
+            JOptionPane.showMessageDialog(null, "Ingrese el codigo");
+        } else {
+            prod = proDao.buscarCodigo(cod);
+            if (prod.getId() > 0) {
+                id.setText("" + prod.getId());
+                producto.setText(prod.getDescripcion());
+                if (accion == 0) {
+                    precio.setText("" + prod.getPrecio_compra());
+                } else {
+                    precio.setText("" + prod.getPrecio_venta());
+                    views.txtStockNV.setText("" + prod.getCantidad());
+                }
+                cant.requestFocus();
+            } else {
+                JOptionPane.showMessageDialog(null, "El producto no existe o esta inactivo","Producto no encontrado",JOptionPane.ERROR_MESSAGE);
+            }
+
+        }
+    }
+
+    // Insertar venta
+    private void insertarVenta() {
+        Combo cliente = (Combo) views.cbxClientes.getSelectedItem();
+        int id_cliente = cliente.getId();
+        String total = views.JLabelTotalPagar.getText();
+        int id_user = Integer.parseInt(views.txtIdUsuario.getText());
+        if (proDao.registrarVenta(id_cliente, total, id_user)) {
+           int id = proDao.getUltimoId("ventas");
+            for (int i = 0; i < views.TableNuevaVenta.getRowCount(); i++) {
+                double precio = Double.parseDouble(views.TableNuevaVenta.getValueAt(i, 3).toString());
+                int cantidad = Integer.parseInt(views.TableNuevaVenta.getValueAt(i, 2).toString());
+                int id_producto = Integer.parseInt(views.TableNuevaVenta.getValueAt(i, 0).toString());
+                double sub_total = precio * cantidad;
+                proDao.registrarVentaDetalle(id, id_producto, precio, cantidad, sub_total);
+                prod = proDao.buscarId(id_producto);
+                int stockActual = prod.getCantidad() - cantidad;
+                proDao.actualizarStock(stockActual, id_producto);
+            }
+            limpiarTableDetalle();
+            JOptionPane.showMessageDialog(null, "Venta generada", "Confirmacion", JOptionPane.INFORMATION_MESSAGE);
+            proDao.generarticketVenta(id);
+//proDao.generarReporte(id);
+//                
+        }
+    }
 
     
 

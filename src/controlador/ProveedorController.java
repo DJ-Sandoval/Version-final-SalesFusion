@@ -56,6 +56,7 @@ public class ProveedorController implements ActionListener, MouseListener, KeyLi
         this.views.TableProveedor.addMouseListener(this);
         this.views.JMenuEliminarProv.addActionListener(this);
         this.views.JMenuReingresarProv.addActionListener(this);
+        this.views.jMenuEditarProv.addActionListener(this);
         llenarProveedor();   
         AutoCompleteDecorator.decorate(productoNuevo.cbxProveedorPr);
         AutoCompleteDecorator.decorate(views.cbxProvNC);
@@ -126,7 +127,18 @@ public class ProveedorController implements ActionListener, MouseListener, KeyLi
                     JOptionPane.showMessageDialog(null, "Error al eliminar proveedor");
                 }
             }
-        } else if (e.getSource() == views.JMenuReingresarProv){
+        } else if (e.getSource() == views.jMenuEditarProv) {
+            if (views.txtIdProv.getText().equals("")) {
+                JOptionPane.showMessageDialog(null, "Selecciona una fila");
+            } else {
+                int id = Integer.parseInt(views.txtIdProv.getText());
+                if (prDao.modificar(prov)) {
+                     proveedorModificado.setVisible(true);
+                }
+            }
+        } 
+        
+        else if (e.getSource() == views.JMenuReingresarProv){
             if (views.txtIdProv.getText().equals("")) {  
                 JOptionPane.showMessageDialog(null, "Selecciona una fila", "Información", JOptionPane.INFORMATION_MESSAGE);
             } else {
@@ -197,7 +209,6 @@ public class ProveedorController implements ActionListener, MouseListener, KeyLi
             proveedorModificado.txtNombreProv.setText(views.TableProveedor.getValueAt(fila, 2).toString());
             proveedorModificado.txtTelefonoProv.setText(views.TableProveedor.getValueAt(fila, 3).toString());
             proveedorModificado.txtDireccionProv.setText(views.TableProveedor.getValueAt(fila, 4).toString());
-            proveedorModificado.setVisible(true);
         }
    }
 

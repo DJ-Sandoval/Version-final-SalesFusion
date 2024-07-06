@@ -94,7 +94,6 @@ public class FrmModificarUsuario extends javax.swing.JDialog {
         cbxCajaUser.setBackground(new java.awt.Color(47, 47, 47));
         cbxCajaUser.setFont(new java.awt.Font("SansSerif", 0, 14)); // NOI18N
         cbxCajaUser.setForeground(new java.awt.Color(255, 255, 255));
-        cbxCajaUser.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "General" }));
         cbxCajaUser.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 cbxCajaUserKeyPressed(evt);
@@ -257,7 +256,7 @@ public class FrmModificarUsuario extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public controlador.MyButton btnModificarUser;
-    public javax.swing.JComboBox<String> cbxCajaUser;
+    public javax.swing.JComboBox<Object> cbxCajaUser;
     public javax.swing.JComboBox<String> cbxRolUser;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

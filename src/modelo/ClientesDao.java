@@ -21,10 +21,18 @@ public class ClientesDao {
     PreparedStatement ps;
     ResultSet rs;
     
-    public boolean registrar(Clientes cl) {
+    public String registrar(Clientes cl) {
+        String consulta = "SELECT * FROM clientes WHERE nombre = ?, telefono = ?";
        String sql = "INSERT INTO clientes (nombre, telefono, direccion, combinacion, yogurt, helado, cobertura) VALUES (?,?,?,?,?,?,?)";
        try {
            con = cn.getConexion();
+           ps = con.prepareStatement(consulta);
+           ps.setString(1, cl.getNombre());
+           ps.setString(2, cl.getTelefono());
+           rs = ps.executeQuery();
+           if (rs.next()) {
+               return "existe";
+           } else {
            ps = con.prepareStatement(sql);
            ps.setString(1, cl.getNombre());
            ps.setString(2, cl.getTelefono());
@@ -34,11 +42,13 @@ public class ClientesDao {
            ps.setString(6, cl.getHelado());
            ps.setString(7, cl.getCobertura());
            ps.execute();
-           return true;
+           return "registrado";
+           }
        } catch (SQLException e) {
            JOptionPane.showMessageDialog(null, e.toString());
-           return false;
+           return "error";
        }
+       
    }
     
        // Listar Usuarios
@@ -75,25 +85,35 @@ public class ClientesDao {
         return listaCli;
     }
    
-   // Modificar registro
-   public boolean modificar(Clientes cl) {
-       String sql = "UPDATE clientes SET nombre = ?, telefono = ?, direccion =?, combinacion = ?, yogurt = ?, helado = ?, cobertura = ? WHERE id = ?";
-       try {
-           con = cn.getConexion();
-           ps = con.prepareStatement(sql);
-           ps.setString(1, cl.getNombre());
-           ps.setString(2, cl.getTelefono());
-           ps.setString(3, cl.getDireccion());
-           ps.setString(4, cl.getCombinacion());
-           ps.setString(5, cl.getYogurt());
-           ps.setString(6, cl.getHelado());
-           ps.setString(7, cl.getCobertura());
-           ps.setInt(8, cl.getId());
-           ps.execute();
-           return true;
-       } catch (SQLException e) {
-           JOptionPane.showMessageDialog(null, e.toString());
-           return false;
+    // Modificar registro
+    public String modificar(Clientes cl) {
+        String consulta = "SELECT * FROM clientes WHERE nombre = ? AND telefono = ? AND id != ?";
+        String sql = "UPDATE clientes SET nombre = ?, telefono = ?, direccion =?, combinacion = ?, yogurt = ?, helado = ?, cobertura = ? WHERE id = ?";
+        try {
+            con = cn.getConexion();
+            ps = con.prepareStatement(consulta);
+            ps.setString(1, cl.getNombre());
+            ps.setString(2, cl.getTelefono());
+            ps.setInt(3, cl.getId());
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return "existe";
+            } else {
+                ps = con.prepareStatement(sql);
+                ps.setString(1, cl.getNombre());
+                ps.setString(2, cl.getTelefono());
+                ps.setString(3, cl.getDireccion());
+                ps.setString(4, cl.getCombinacion());
+                ps.setString(5, cl.getYogurt());
+                ps.setString(6, cl.getHelado());
+                ps.setString(7, cl.getCobertura());
+                ps.setInt(8, cl.getId());
+                ps.execute();
+                return "modificado";
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e.toString());
+            return "error";
        }
    }
    

@@ -51,6 +51,7 @@ public class CategoriaController implements ActionListener, MouseListener, KeyLi
         this.views.txtBuscarCategoria.addKeyListener(this);
         this.views.JMenuEliminarCat.addActionListener(this);
         this.views.JMenuReingresarCat.addActionListener(this);
+        this.views.jMenuEditarCat.addActionListener(this);
         this.views.TableCat.addMouseListener(this);
         llenarCategoria();
         AutoCompleteDecorator.decorate(productoNuevo.cbxCategoriaPro);
@@ -97,7 +98,16 @@ public class CategoriaController implements ActionListener, MouseListener, KeyLi
                     }
                 }
             }
-        } else if (e.getSource() == views.JMenuEliminarCat) {
+        } else if (e.getSource() == views.jMenuEditarCat) {
+            if (views.txtIdCat.getText().equals("")) {
+                JOptionPane.showMessageDialog(null, "Selecciona una fila", "Información", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                int id = Integer.parseInt(views.txtIdCat.getText());
+                ctM.setVisible(true);
+            }
+        }
+        
+        else if (e.getSource() == views.JMenuEliminarCat) {
             if (views.txtIdCat.getText().equals("")) {
                 JOptionPane.showMessageDialog(null, "Selecciona una fila", "Información", JOptionPane.INFORMATION_MESSAGE);
             } else {
@@ -129,7 +139,8 @@ public class CategoriaController implements ActionListener, MouseListener, KeyLi
             limpiar();
         }
     }
-    private void listarCategorias() {
+    
+    public void listarCategorias() {
         Tables color = new Tables();
         views.TableCat.setDefaultRenderer(views.TableCat.getColumnClass(0), color);
         List<Categorias> lista = ctDao.ListaCategoria(views.txtBuscarCategoria.getText());
@@ -161,7 +172,7 @@ public class CategoriaController implements ActionListener, MouseListener, KeyLi
             int fila = views.TableCat.rowAtPoint(e.getPoint());
             views.txtIdCat.setText(views.TableCat.getValueAt(fila, 0).toString());
             ctM.txtNombreCat.setText(views.TableCat.getValueAt(fila, 1).toString());
-            ctM.setVisible(true);
+            //ctM.setVisible(true);
         }
     }
 

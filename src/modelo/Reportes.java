@@ -801,4 +801,108 @@ public class Reportes {
         }
     }
     
+     /* ********************************************************************
+    * metodo para crear reportes de las ventas registradas en el sistema
+    **********************************************************************/ 
+    public void generarReporteVentas() {
+        Document documento = new Document();
+        try {
+            Font negrita = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.BOLD, BaseColor.WHITE);
+            String ruta = System.getProperty("user.home");
+            PdfWriter.getInstance(documento, new FileOutputStream(ruta + "/Desktop/Reporte_Ventas.pdf"));
+            documento.open();
+
+            // Imagen del encabezado
+            com.itextpdf.text.Image header = com.itextpdf.text.Image.getInstance("src/img/46.jpg");
+            header.scaleToFit(128, 128);
+            header.setAlignment(Element.ALIGN_LEFT);
+
+            // Formato al texto
+            Paragraph parrafo = new Paragraph();
+            parrafo.add("Reporte creado por SalesFusionPOSV2.2\n © DevSandoval\n\n");
+            parrafo.setFont(FontFactory.getFont("Tahoma", 18, Font.BOLD, BaseColor.DARK_GRAY));
+            parrafo.setAlignment(Element.ALIGN_CENTER);
+            parrafo.add("Reporte de Ventas\n\n");
+
+            // Crear una tabla con dos columnas
+            PdfPTable tablaEncabezado = new PdfPTable(2);
+            tablaEncabezado.setWidthPercentage(100); // ANcho de la tabla al 100%
+            tablaEncabezado.setWidths(new int[]{1, 3}); // Proporcion del ancho de las columnas
+
+            // Agregar la imagen a la primera celda
+            PdfPCell celdaImagen = new PdfPCell(header);
+            celdaImagen.setBorder(Rectangle.NO_BORDER); // Sin bordes
+            tablaEncabezado.addCell(celdaImagen);
+
+            // Agregar el parrafo ala segunda celda
+            PdfPCell celdaParrafo = new PdfPCell(parrafo);
+            celdaParrafo.setBorder(Rectangle.NO_BORDER); // Sin bordes
+            celdaParrafo.setVerticalAlignment(Element.ALIGN_MIDDLE); // Alineacion vertical al medio
+            tablaEncabezado.addCell(celdaParrafo);
+
+            // Agregar la tabla al documento
+            documento.add(tablaEncabezado);
+
+            // Creacion de la tabla de datos
+            PdfPTable tabla = new PdfPTable(4);
+            tabla.setWidthPercentage(100); // Ancho de la tabla al 100%
+            float[] tamanioVentas = new float[]{25f, 25f, 25f, 25f};
+            tabla.setWidths(tamanioVentas);
+            tabla.setHorizontalAlignment(Element.ALIGN_LEFT);
+            tabla.getDefaultCell().setBorder(0);
+
+            // Encabezado de medidas
+            PdfPCell idVen = new PdfPCell(new Phrase("Id", negrita));
+            PdfPCell idCli = new PdfPCell(new Phrase("Cliente", negrita));
+            PdfPCell total = new PdfPCell(new Phrase("total", negrita));
+            PdfPCell fecha = new PdfPCell(new Phrase("fecha", negrita));
+
+            // Eliminar bordes de los encabezados
+            idVen.setBorder(0);
+            idCli.setBorder(0);
+            total.setBorder(0);
+            fecha.setBorder(0);
+
+            // Color de fondo del encabezado
+            idVen.setBackgroundColor(BaseColor.DARK_GRAY);
+            idCli.setBackgroundColor(BaseColor.DARK_GRAY);
+            total.setBackgroundColor(BaseColor.DARK_GRAY);
+            fecha.setBackgroundColor(BaseColor.DARK_GRAY);
+   
+
+            // Agregar los encabezados de la medida
+            tabla.addCell(idVen);
+            tabla.addCell(idCli);
+            tabla.addCell(total);
+            tabla.addCell(fecha);
+
+            // Creando la consulta y la agregamos a un String
+            String consultaVentas = "SELECT id, id_cliente, total, fecha FROM ventas";
+            try {
+                con = cn.getConexion(); // Inicializamos la conexion
+                ps = con.prepareStatement(consultaVentas);
+                rs = ps.executeQuery();
+                while (rs.next()) {  // Cambiado a while en lugar de if
+                    tabla.addCell(rs.getString(1));
+                    tabla.addCell(rs.getString(2));
+                    tabla.addCell(rs.getString(3));
+                    tabla.addCell(rs.getString(4));
+                }
+                documento.add(tabla);
+            } catch (SQLException e) {
+                System.out.println("Error 4 en: " + e);
+            }
+            documento.close();
+
+            JOptionPane.showMessageDialog(null, "Reporte creado");
+
+        } catch (DocumentException e) {
+            System.out.println("Error 1 en: " + e);
+        } catch (FileNotFoundException ex) {
+            System.out.println("Error 2 en: " + ex);
+        } catch (IOException ex) {
+            System.out.println("Error 3 en: " + ex);
+        }
+    }
+    
 }

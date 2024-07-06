@@ -210,6 +210,7 @@ public class FrmReportes extends javax.swing.JDialog  {
                 reporte.generarReporteClientes();
                 break;
             case 3:
+                reporte.generarReporteVentas();
                 // Acciones para la opción 3
                 break;
             case 4:

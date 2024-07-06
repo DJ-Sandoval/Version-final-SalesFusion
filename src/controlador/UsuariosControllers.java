@@ -13,6 +13,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
+import modelo.Combo;
 import modelo.Tables;
 import modelo.UsuarioDao;
 import modelo.Usuarios;
@@ -45,11 +46,14 @@ public class UsuariosControllers implements ActionListener, MouseListener, KeyLi
         this.views.btnRegistrarUser.addActionListener(this);
         this.views.TableUsers.addMouseListener(this);
         //this.views.btnModificarUser.addActionListener(this);
+        this.views.jMenuEditarUs.addActionListener(this);
         this.usuarioModificado.btnModificarUser.addActionListener(this);
         this.views.JMenuEliminarUsers.addActionListener(this);
         this.views.JMenuReingresarUsers.addActionListener(this);
+        this.views.jMenuEditarUs.addActionListener(this);
         this.views.txtBuscarUsers.addKeyListener(this);
         listarUsuarios();
+       
     }
 
     @Override
@@ -63,7 +67,8 @@ public class UsuariosControllers implements ActionListener, MouseListener, KeyLi
                 us.setUsuario(usuarioNuevo.txtUsuarioUser.getText());
                 us.setNombre(usuarioNuevo.txtNombreUser.getText());
                 us.setClave(String.valueOf(usuarioNuevo.txtClaveUser.getPassword()));
-                us.setCaja(usuarioNuevo.cbxCajaUser.getSelectedItem().toString());
+                Combo itemCaja = (Combo) usuarioNuevo.cbxCajaUser.getSelectedItem();
+                us.setCaja(itemCaja.getId());
                 us.setRol(usuarioNuevo.cbxRolUser.getSelectedItem().toString());
                 if (usDao.registrar(us)) {
                     limpiarTable();
@@ -84,8 +89,8 @@ public class UsuariosControllers implements ActionListener, MouseListener, KeyLi
             } else {
                 us.setUsuario(usuarioModificado.txtUsuarioUser.getText());
                 us.setNombre(usuarioModificado.txtNombreUser.getText());
-                us.setClave(String.valueOf(usuarioModificado.txtClaveUser.getPassword()));
-                us.setCaja(usuarioModificado.cbxCajaUser.getSelectedItem().toString());
+                Combo itemCaja = (Combo) usuarioModificado.cbxCajaUser.getSelectedItem();
+                us.setCaja(itemCaja.getId());
                 us.setRol(usuarioModificado.cbxRolUser.getSelectedItem().toString());
                 us.setId(Integer.parseInt(views.txtIdUser.getText()));
                 if (usDao.modificar(us)) {
@@ -127,9 +132,17 @@ public class UsuariosControllers implements ActionListener, MouseListener, KeyLi
                     JOptionPane.showMessageDialog(null, "Error al reingresar usuario");
                 }
             }
-        } else {
-            limpiar2();
+        } else if (e.getSource() == views.jMenuEditarUs) {
+            if (views.txtIdUser.getText().equals("")) {
+                JOptionPane.showMessageDialog(null, "Seleccione una fila","Fila no seleccionada",JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                int id = Integer.parseInt(views.txtIdUser.getText());
+                usuarioModificado.setVisible(true);
+            }
         }
+        else {
+            limpiar2();
+        } 
         
     }
 
@@ -139,14 +152,15 @@ public class UsuariosControllers implements ActionListener, MouseListener, KeyLi
         views.TableUsers.setDefaultRenderer(views.TableUsers.getColumnClass(0), color);
         List<Usuarios> lista = usDao.ListaUsuario(views.txtBuscarUsers.getText());
         modelo = (DefaultTableModel) views.TableUsers.getModel();
-        Object[] ob = new Object[6];
+        Object[] ob = new Object[7];
         for (int i = 0; i < lista.size(); i++) {
             ob[0] = lista.get(i).getId();
             ob[1] = lista.get(i).getUsuario();
             ob[2] = lista.get(i).getNombre();
-            ob[3] = lista.get(i).getCaja();
-            ob[4] = lista.get(i).getRol();
-            ob[5] = lista.get(i).getEstado();
+            ob[3] = lista.get(i).getRol();
+            ob[4] = lista.get(i).getNombre_caja();
+            ob[5] = lista.get(i).getCaja();
+            ob[6] = lista.get(i).getEstado();
             modelo.addRow(ob);
         }
         // Establecer modelo a tabla
@@ -183,14 +197,14 @@ public class UsuariosControllers implements ActionListener, MouseListener, KeyLi
             views.txtIdUser.setText(views.TableUsers.getValueAt(fila, 0).toString());
             usuarioModificado.txtUsuarioUser.setText(views.TableUsers.getValueAt(fila, 1).toString());
             usuarioModificado.txtNombreUser.setText(views.TableUsers.getValueAt(fila, 2).toString());
-            usuarioModificado.cbxCajaUser.setSelectedItem(views.TableUsers.getValueAt(fila, 3).toString());
-            usuarioModificado.cbxRolUser.setSelectedItem(views.TableUsers.getValueAt(fila, 4).toString());
+             usuarioModificado.cbxRolUser.setSelectedItem(views.TableUsers.getValueAt(fila, 3).toString());
+            int id_caja = Integer.parseInt(views.TableUsers.getValueAt(fila, 5).toString());
+            String caja = views.TableUsers.getValueAt(fila, 4).toString();
+            usuarioModificado.cbxCajaUser.setSelectedItem(new Combo(id_caja, caja));
             usuarioModificado.txtClaveUser.setEnabled(false);
-            usuarioModificado.setVisible(true);
-            //views.btnRegistrarUser.setEnabled(false);
         }
     }
-    
+
     // Metodos Mouse
     @Override
     public void mousePressed(MouseEvent e) {
@@ -237,5 +251,7 @@ public class UsuariosControllers implements ActionListener, MouseListener, KeyLi
         //views.txtNombreUser.setText("");
        // views.txtClaveUser.setText("");
     }
+    
+   
 
 }

@@ -57,6 +57,7 @@ public class MedidaController implements ActionListener, MouseListener, KeyListe
         this.views.txtBuscarMed.addKeyListener(this);
         this.views.JMenuEliminarMed.addActionListener(this);
         this.views.JMenuReingresarMed.addActionListener(this);
+        this.views.jMenuEditarMed.addActionListener(this);
         this.views.TableMed.addMouseListener(this);
         
         llenarMedida();
@@ -106,7 +107,16 @@ public class MedidaController implements ActionListener, MouseListener, KeyListe
                     }
                 }
             }
-       } else if (e.getSource() == views.JMenuEliminarMed) {
+       } else if (e.getSource() == views.jMenuEditarMed) {
+           if (views.txtIdMed.getText().equals("")) {
+               JOptionPane.showMessageDialog(null, "Selecciona una fila", "Información", JOptionPane.INFORMATION_MESSAGE);
+           } else {
+               int id = Integer.parseInt(views.txtIdMed.getText());
+               modificarMedida.setVisible(true);
+           }
+       }
+       
+       else if (e.getSource() == views.JMenuEliminarMed) {
             if (views.txtIdMed.getText().equals("")) {
                 JOptionPane.showMessageDialog(null, "Selecciona una fila", "Información", JOptionPane.INFORMATION_MESSAGE);
             } else {
@@ -189,7 +199,7 @@ public class MedidaController implements ActionListener, MouseListener, KeyListe
             views.txtIdMed.setText(views.TableMed.getValueAt(fila, 0).toString());
             modificarMedida.txtNombreMed.setText(views.TableMed.getValueAt(fila, 1).toString());
             modificarMedida.txtNombreCortoMed.setText(views.TableMed.getValueAt(fila, 2).toString());
-             modificarMedida.setVisible(true);
+             //modificarMedida.setVisible(true);
         }
     }
 

@@ -44,8 +44,10 @@ public class ClientesController implements ActionListener, MouseListener, KeyLis
         this.views.TableClientes.addMouseListener(this);
         this.views.JMenuEliminarCli.addActionListener(this);
         this.views.JMenuReingresarCli.addActionListener(this);
+        this.views.JMenuEditarCli.addActionListener(this);
         this.views.txtBuscarCli.addKeyListener(this);
         listarClienter();
+        
     }
     
     // Metodo abstracto de accion para los botones
@@ -68,14 +70,21 @@ public class ClientesController implements ActionListener, MouseListener, KeyLis
                 cl.setYogurt(clienteNuevo.txtYogurtCli.getText());
                 cl.setHelado(clienteNuevo.txtHeladoCli.getText());
                 cl.setCobertura(clienteNuevo.txtCoberturaCli.getText());
-                if (clDao.registrar(cl)) {
-                    limpiarTable();
-                    listarClienter();
-                    limpiar();
-                    JOptionPane.showMessageDialog(null, "Cliente registrado");
-                    clienteNuevo.dispose();
-                } else {
-                    JOptionPane.showMessageDialog(null, "Error al registrar", "Error", JOptionPane.ERROR_MESSAGE);
+                String respuesta = clDao.registrar(cl);
+                switch (respuesta) {
+                    case "existe":
+                        JOptionPane.showMessageDialog(null, "El cliente ya existe");
+                        break;
+                    case "registrado":
+                        limpiarTable();
+                        listarClienter();
+                        limpiar();
+                        clienteNuevo.dispose();
+                        JOptionPane.showMessageDialog(null, "Cliente registrado", "Registro confirmado", JOptionPane.INFORMATION_MESSAGE);
+                        break;
+                    default:
+                        JOptionPane.showMessageDialog(null, "Error al registrar", "Error", JOptionPane.ERROR_MESSAGE);
+                        break;
                 }
             }
         } else if (e.getSource() == clienteModificado.btnModificarCli) {
@@ -99,15 +108,22 @@ public class ClientesController implements ActionListener, MouseListener, KeyLis
                     cl.setHelado(clienteModificado.txtHeladoCli.getText());
                     cl.setCobertura(clienteModificado.txtCoberturaCli.getText());
                     cl.setId(Integer.parseInt(views.txtIdCli.getText()));
-                    if (clDao.modificar(cl)) {
-                        limpiarTable();
-                        listarClienter();
-                        limpiar();
-                        JOptionPane.showMessageDialog(null, "Cliente modificado");
-                        clienteModificado.dispose();
-                        views.txtIdCli.setText("");
-                    } else {
+                    String respuesta = clDao.modificar(cl);
+                    switch (respuesta) {
+                        case "existe":
+                            JOptionPane.showMessageDialog(null, "El cliente ya existe");
+                            break;
+                        case "modificado":
+                            limpiarTable();
+                            listarClienter();
+                            limpiar();
+                            JOptionPane.showMessageDialog(null, "Cliente modificado con exito");
+                            clienteModificado.dispose();
+                            views.txtIdCli.setText("");
+                            break;
+                        default:       
                         JOptionPane.showMessageDialog(null, "Error al modificar cliente", "Error", JOptionPane.ERROR_MESSAGE);
+                        break;
                     }
                 }
             }
@@ -139,7 +155,15 @@ public class ClientesController implements ActionListener, MouseListener, KeyLis
                     JOptionPane.showMessageDialog(null, "Error al reingresar cliente", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
-        } else {
+        } else if (e.getSource() == views.JMenuEditarCli) {
+            if (views.txtIdCli.getText().equals("")) {
+                JOptionPane.showMessageDialog(null, "", "Campo vacio", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                int id = Integer.parseInt(views.txtIdCli.getText());
+                clienteModificado.setVisible(true);
+            }
+        }
+        else {
             limpiar();
         }
         
@@ -196,7 +220,7 @@ public class ClientesController implements ActionListener, MouseListener, KeyLis
             clienteModificado.txtYogurtCli.setText(views.TableClientes.getValueAt(fila, 5).toString());
             clienteModificado.txtHeladoCli.setText(views.TableClientes.getValueAt(fila, 6).toString());
             clienteModificado.txtCoberturaCli.setText(views.TableClientes.getValueAt(fila, 7).toString());
-            clienteModificado.setVisible(true);
+            //clienteModificado.setVisible(true);
         }
     }
 

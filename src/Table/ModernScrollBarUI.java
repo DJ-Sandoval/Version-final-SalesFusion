@@ -17,7 +17,6 @@ import javax.swing.plaf.basic.BasicScrollBarUI;
  */
 public class ModernScrollBarUI extends BasicScrollBarUI {
     private final int THUMB_SIZE = 80;
-    
 
     @Override
     protected Dimension getMaximumThumbSize() {
@@ -25,7 +24,7 @@ public class ModernScrollBarUI extends BasicScrollBarUI {
             return new Dimension(0, THUMB_SIZE);
         } else {
             return new Dimension(THUMB_SIZE, 0);
-        }     
+        }
     }
 
     @Override
@@ -34,27 +33,22 @@ public class ModernScrollBarUI extends BasicScrollBarUI {
             return new Dimension(0, THUMB_SIZE);
         } else {
             return new Dimension(THUMB_SIZE, 0);
-        }     
+        }
     }
-    
 
     @Override
     protected JButton createIncreaseButton(int i) {
         return new ScrollBarButton();
     }
-    
-   
 
     @Override
     protected JButton createDecreaseButton(int i) {
         return new ScrollBarButton();
     }
-    
-
 
     @Override
     protected void paintTrack(Graphics grphcs, JComponent jc, Rectangle rctngl) {
-         Graphics2D g2 = (Graphics2D) grphcs;
+        Graphics2D g2 = (Graphics2D) grphcs;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         int orientation = scrollbar.getOrientation();
         int size;
@@ -78,8 +72,8 @@ public class ModernScrollBarUI extends BasicScrollBarUI {
         g2.setColor(scrollbar.getBackground());
         g2.fillRect(x, y, width, height);
     }
-    
-     @Override
+
+    @Override
     protected void paintThumb(Graphics grphcs, JComponent jc, Rectangle rctngl) {
         Graphics2D g2 = (Graphics2D) grphcs;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -97,10 +91,7 @@ public class ModernScrollBarUI extends BasicScrollBarUI {
         g2.setColor(scrollbar.getForeground());
         g2.fillRoundRect(x, y, width, height, 10, 10);
     }
-    
-    
-    
-    
+
     private class ScrollBarButton extends JButton {
 
         public ScrollBarButton() {

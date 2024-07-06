@@ -20,8 +20,7 @@ import javax.swing.table.DefaultTableCellRenderer;
  * @author Jose
  */
 public class TableDark extends JTable {
-
-    private TableDarkHeader header;
+      private TableDarkHeader header;
     private TableDarkCell cell;
 
     public TableDark() {
@@ -71,7 +70,7 @@ public class TableDark extends JTable {
             Component com = super.getTableCellRendererComponent(jtable, o, bln, bln1, i, i1);
             com.setBackground(new Color(30, 30, 30));
             com.setForeground(new Color(255, 255, 255));
-            com.setFont(com.getFont().deriveFont(Font.BOLD, 16));
+            com.setFont(com.getFont().deriveFont(Font.BOLD, 12));
             if (alignment.containsKey(i1)) {
                 setHorizontalAlignment(alignment.get(i1));
             } else {
@@ -105,7 +104,7 @@ public class TableDark extends JTable {
                     com.setBackground(new Color(30, 30, 30));
                 }
             }
-            com.setForeground(new Color(255, 255, 255));
+            com.setForeground(new Color(200, 200, 200));
             setBorder(new EmptyBorder(0, 5, 0, 5));
             if (alignment.containsKey(column)) {
                 setHorizontalAlignment(alignment.get(column));
@@ -115,4 +114,5 @@ public class TableDark extends JTable {
             return com;
         }
     }
+    
 }

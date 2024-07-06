@@ -62,16 +62,18 @@ public class Menu extends javax.swing.JPanel {
         addMenu("7", "Proveedores", 6);
         addMenu("8", "Medidas", 7);
         addMenu("9", "Categorias", 8);
+        addMenu("14", "Cajas", 9);
         split("Extras");
-        addMenu("10", "Configuraciones", 9);
-        addMenu("11", "Reportes", 10);
-        addMenu("12","Stock de productos",11);
-        addMenu("13", "Historial de ventas", 12); 
-        addMenu("14", "Caja", 13);
+        addMenu("10", "Configuraciones", 10);
+        addMenu("11", "Reportes", 11);
+        addMenu("12","Stock de productos",12);
+        addMenu("13", "Historial de ventas", 13); 
+        addMenu("14", "Apertura y Cierre de Caja", 14);
         split("Inventario");
-        addMenu("15","Inventario de compras", 14);
+        addMenu("15","Inventario de compras", 15);
+        addMenu("16", "Inventario de ventas", 16);
         space();
-        addMenu("key","Cerrar cuenta", 15);
+        addMenu("key","Cerrar cuenta", 17);
     }
 
     public void addMenu(String icon, String text, int index) {

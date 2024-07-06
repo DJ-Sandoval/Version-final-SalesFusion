@@ -54,7 +54,7 @@ public class comprasDao {
     }
 */
     
-    // Listar Proveedores listaProveedores
+    // Listar Compras
 public List<compras> ListaCompras(String valor) {
     List<compras> lista = new ArrayList<>();
     // Consulta para ordenar registros listados y buscar en la caja de texto
@@ -123,5 +123,10 @@ public List<compras> ListaCompras(String valor) {
         return false;
     }
 }
+    
+    // Metodo para refrescar tabla
+    public void refrescarTablaCompras() {
+        
+    }
 
 }

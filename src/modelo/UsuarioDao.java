@@ -28,7 +28,6 @@ public class UsuarioDao {
                 us.setId(rs.getInt("id"));
                 us.setUsuario(rs.getString("usuario"));
                 us.setNombre(rs.getString("nombre"));
-                us.setCaja(rs.getString("caja"));
                 us.setRol(rs.getString("rol"));
                 us.setEstado(rs.getString("estado"));
             }
@@ -123,14 +122,14 @@ public class UsuarioDao {
    */
 
    public boolean registrar(Usuarios us) {
-       String sql = "INSERT INTO Usuarios (usuario, nombre, clave, caja, rol) VALUES (?,?,?,?,?)";
+       String sql = "INSERT INTO Usuarios (usuario, nombre, clave, id_caja, rol) VALUES (?,?,?,?,?)";
        try {
            con = cn.getConexion();
            ps = con.prepareStatement(sql);
            ps.setString(1, us.getUsuario());
            ps.setString(2, us.getNombre());
            ps.setString(3, us.getClave());
-           ps.setString(4, us.getCaja());
+           ps.setInt(4, us.getCaja());
            ps.setString(5, us.getRol());
            ps.execute();
            return true;
@@ -144,8 +143,8 @@ public class UsuarioDao {
     public List ListaUsuario(String valor) {
         List<Usuarios> listaUsers = new ArrayList();
         // Consulta para ordenar registros listados y buscar en la caja de texto
-        String sql = "SELECT * FROM Usuarios ORDER BY estado ASC";
-        String buscar = "SELECT * FROM Usuarios WHERE usuario LIKE '%" + valor + "%' OR nombre LIKE '%" + valor + "%'";
+        String sql = "SELECT u.*, c.caja AS caja FROM usuarios u INNER JOIN cajas c ON u.id_caja = c.id ORDER BY u.estado ASC";
+        String buscar = "SELECT u.*, c.caja AS caja FROM usuarios u INNER JOIN cajas c ON u.id_caja = c.id WHERE u.usuario LIKE '%" + valor + "%' OR u.nombre LIKE '%"+ valor+"%' OR c.caja LIKE '%"+ valor +"%'";
         try {
             con = cn.getConexion();
             if (valor.equalsIgnoreCase("")) {
@@ -160,7 +159,8 @@ public class UsuarioDao {
                 us.setId(rs.getInt("id"));
                 us.setUsuario(rs.getString("usuario"));
                 us.setNombre(rs.getString("nombre"));
-                us.setCaja(rs.getString("caja"));
+                us.setCaja(rs.getInt("id_caja"));
+                us.setNombre_caja(rs.getString("caja"));
                 us.setRol(rs.getString("rol"));
                 us.setEstado(rs.getString("estado"));
                 listaUsers.add(us);
@@ -173,13 +173,13 @@ public class UsuarioDao {
    
    // Modificar registro
    public boolean modificar(Usuarios us) {
-       String sql = "UPDATE Usuarios SET usuario = ?, nombre = ?, caja =?, rol = ? WHERE id = ?";
+       String sql = "UPDATE Usuarios SET usuario = ?, nombre = ?, id_caja =?, rol = ? WHERE id = ?";
        try {
            con = cn.getConexion();
            ps = con.prepareStatement(sql);
            ps.setString(1, us.getUsuario());
            ps.setString(2, us.getNombre());
-           ps.setString(3, us.getCaja());
+           ps.setInt(3, us.getCaja());
            ps.setString(4, us.getRol());
            ps.setInt(5, us.getId());
            ps.execute();

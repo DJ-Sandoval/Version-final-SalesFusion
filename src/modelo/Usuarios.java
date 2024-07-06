@@ -10,33 +10,24 @@ public class Usuarios {
    private String usuario;
    private String nombre;
    private String clave;
-   private String caja;
+   private int caja;
+   private String nombre_caja;
    private String rol;
    private String estado;
-   
-   // Constructor vacio
-   public Usuarios() {
-       id = 0;
-       usuario = "";
-       nombre = "";
-       clave = "";
-       caja = "";
-       rol = "";
-       estado = "";
-   }
-   
-   // Constructor con parametros
-    public Usuarios(int id, String usuario, String nombre, String clave, String caja, String rol, String estado) {
+
+    public Usuarios() {
+    }
+
+    public Usuarios(int id, String usuario, String nombre, String clave, int caja, String nombre_caja, String rol, String estado) {
         this.id = id;
         this.usuario = usuario;
         this.nombre = nombre;
         this.clave = clave;
         this.caja = caja;
+        this.nombre_caja = nombre_caja;
         this.rol = rol;
         this.estado = estado;
     }
-   
-    // Getteo y Setteo
 
     public int getId() {
         return id;
@@ -70,12 +61,20 @@ public class Usuarios {
         this.clave = clave;
     }
 
-    public String getCaja() {
+    public int getCaja() {
         return caja;
     }
 
-    public void setCaja(String caja) {
+    public void setCaja(int caja) {
         this.caja = caja;
+    }
+
+    public String getNombre_caja() {
+        return nombre_caja;
+    }
+
+    public void setNombre_caja(String nombre_caja) {
+        this.nombre_caja = nombre_caja;
     }
 
     public String getRol() {
@@ -93,11 +92,9 @@ public class Usuarios {
     public void setEstado(String estado) {
         this.estado = estado;
     }
+
     
-    // Metodo toString
-    @Override
-    public String toString() {
-        return "Usuarios{" + "id=" + id + ", usuario=" + usuario + ", nombre=" + nombre + ", clave=" + clave + ", caja=" + caja + ", rol=" + rol + ", estado=" + estado + '}';
-    }
-    
+   
+   
+   
 }
