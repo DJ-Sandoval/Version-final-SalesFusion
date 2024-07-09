@@ -399,7 +399,8 @@ public class ProductosDao {
           empresa.setHorizontalAlignment(Element.ALIGN_LEFT);
           empresa.getDefaultCell().setBorder(0);
           // Capturar y agregar Logotipo
-          Image img = Image.getInstance(getClass().getResource("/img/ReporteProv.png"));
+          Image img = Image.getInstance(getClass().getResource("/img/46.jpg"));
+          img.scaleToFit(128, 128);
           empresa.addCell(img);
           empresa.addCell("");
           
@@ -442,7 +443,7 @@ public class ProductosDao {
            
            
           // Datos del vendedor
-          empresa.addCell("Nº Compra: " + id_compra + "\nVendedor: " + "Jose Armando"
+          empresa.addCell("Nº Compra: " + id_compra + "\nVendedor: " + "Luis Fernando"
                   + "\nFecha: " + fecha);
           
           doc.add(empresa);
@@ -641,7 +642,8 @@ public class ProductosDao {
           empresa.setHorizontalAlignment(Element.ALIGN_LEFT);
           empresa.getDefaultCell().setBorder(0);
           // Capturar y agregar Logotipo
-          Image img = Image.getInstance(getClass().getResource("/img/ReporteProv.png"));
+          Image img = Image.getInstance(getClass().getResource("/img/46.jpg"));
+          img.scaleToFit(128, 128);
           empresa.addCell(img);
           empresa.addCell("");
           

@@ -227,4 +227,34 @@ public class UsuarioDao {
         }
         return cof;
    }
+   
+   // Metodo para modificar la configuracion
+   public boolean modificar(Configuracion cof) {
+       String sql = "UPDATE configuracion SET rfc=?, nombre=?, telefono=?, direccion=?, codigoPostal=?, mensaje=? WHERE id=?";
+       try {
+           con = cn.getConexion();
+           ps = con.prepareStatement(sql);
+           ps.setString(1, cof.getRfc());
+           ps.setString(2, cof.getNombre());
+           ps.setString(3, cof.getTelefono());
+           ps.setString(4, cof.getDireccion());
+           ps.setString(5, cof.getCodigoPostal());
+           ps.setString(6, cof.getMensaje());
+           ps.setInt(7, cof.getId());
+           
+           int rowsAffected = ps.executeUpdate();
+           return rowsAffected > 0;
+       } catch (SQLException e) {
+           JOptionPane.showMessageDialog(null, e.toString());
+           return false;
+       }
+   }
+   
+   // Metodo para eliminar
+   
+   
+   
+   
+   
+   
 }

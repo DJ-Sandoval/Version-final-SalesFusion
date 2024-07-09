@@ -52,6 +52,7 @@ public class UsuariosControllers implements ActionListener, MouseListener, KeyLi
         this.views.JMenuReingresarUsers.addActionListener(this);
         this.views.jMenuEditarUs.addActionListener(this);
         this.views.txtBuscarUsers.addKeyListener(this);
+        this.views.jMenuUsuario.addActionListener(this);
         listarUsuarios();
        
     }
@@ -139,6 +140,10 @@ public class UsuariosControllers implements ActionListener, MouseListener, KeyLi
                 int id = Integer.parseInt(views.txtIdUser.getText());
                 usuarioModificado.setVisible(true);
             }
+        } else if (e.getSource() == views.jMenuUsuario) {
+            views.jTabbedPane1.setSelectedIndex(3);
+            limpiarTable();
+            listarUsuarios();
         }
         else {
             limpiar2();

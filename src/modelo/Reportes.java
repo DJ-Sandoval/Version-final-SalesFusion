@@ -55,7 +55,7 @@ public class Reportes {
             documento.open();
 
             // Imagen del encabezado
-            com.itextpdf.text.Image header = com.itextpdf.text.Image.getInstance("src/img/header2.png");
+            com.itextpdf.text.Image header = com.itextpdf.text.Image.getInstance("src/img/46.jpg");
             header.scaleToFit(128, 128);
             header.setAlignment(Element.ALIGN_LEFT);
             
@@ -180,7 +180,7 @@ public class Reportes {
             documento.open();
             
             // Imagen del encabezado
-            com.itextpdf.text.Image header = com.itextpdf.text.Image.getInstance("src/img/header2.png");
+            com.itextpdf.text.Image header = com.itextpdf.text.Image.getInstance("src/img/46.jpg");
             header.scaleToFit(128,128);
             header.setAlignment(Element.ALIGN_LEFT);
             
@@ -289,16 +289,16 @@ public class Reportes {
             documento.open();
 
             // Imagen del encabezado
-            com.itextpdf.text.Image header = com.itextpdf.text.Image.getInstance("src/img/header2.png");
+            com.itextpdf.text.Image header = com.itextpdf.text.Image.getInstance("src/img/46.jpg");
             header.scaleToFit(128, 128);
             header.setAlignment(Element.ALIGN_LEFT);
 
             // Formato al texto
             Paragraph parrafo = new Paragraph();
-            parrafo.add("Reporte creado por SalesFusionV2.2\n © DevSandoval\n\n");
+            parrafo.add("Reporte creado por SalesFusionV2.2\n © DevSandoval\nFerChaskas\n");
             parrafo.setFont(FontFactory.getFont("Tahoma", 18, Font.BOLD, BaseColor.DARK_GRAY));
             parrafo.setAlignment(Element.ALIGN_CENTER);
-            parrafo.add("Reporte de compras\n\n");
+            parrafo.add("Reporte de compras apartir de las compras realizadas\n\n");
 
             // Crear una tabla con dos columnas
             PdfPTable tablaEncabezado = new PdfPTable(2);
@@ -392,7 +392,7 @@ public class Reportes {
             documento.open();
 
             // Imagen del encabezado
-            com.itextpdf.text.Image header = com.itextpdf.text.Image.getInstance("src/img/header2.png");
+            com.itextpdf.text.Image header = com.itextpdf.text.Image.getInstance("src/img/46.jpg");
             header.scaleToFit(128, 128);
             header.setAlignment(Element.ALIGN_LEFT);
 
@@ -500,7 +500,7 @@ public class Reportes {
             documento.open();
 
             // Imagen del encabezado
-            com.itextpdf.text.Image header = com.itextpdf.text.Image.getInstance("src/img/header2.png");
+            com.itextpdf.text.Image header = com.itextpdf.text.Image.getInstance("src/img/46.jpg");
             header.scaleToFit(128, 128);
             header.setAlignment(Element.ALIGN_LEFT);
 
@@ -608,7 +608,7 @@ public class Reportes {
             documento.open();
 
             // Imagen del encabezado
-            com.itextpdf.text.Image header = com.itextpdf.text.Image.getInstance("src/img/header2.png");
+            com.itextpdf.text.Image header = com.itextpdf.text.Image.getInstance("src/img/46.jpg");
             header.scaleToFit(128, 128);
             header.setAlignment(Element.ALIGN_LEFT);
 
@@ -709,7 +709,7 @@ public class Reportes {
             documento.open();
 
             // Imagen del encabezado
-            com.itextpdf.text.Image header = com.itextpdf.text.Image.getInstance("src/img/header2.png");
+            com.itextpdf.text.Image header = com.itextpdf.text.Image.getInstance("src/img/46.jpg");
             header.scaleToFit(128, 128);
             header.setAlignment(Element.ALIGN_LEFT);
 

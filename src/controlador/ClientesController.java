@@ -46,6 +46,7 @@ public class ClientesController implements ActionListener, MouseListener, KeyLis
         this.views.JMenuReingresarCli.addActionListener(this);
         this.views.JMenuEditarCli.addActionListener(this);
         this.views.txtBuscarCli.addKeyListener(this);
+        this.views.jMenuCliente.addActionListener(this);
         listarClienter();
         
     }
@@ -162,6 +163,10 @@ public class ClientesController implements ActionListener, MouseListener, KeyLis
                 int id = Integer.parseInt(views.txtIdCli.getText());
                 clienteModificado.setVisible(true);
             }
+        } else if (e.getSource() == views.jMenuCliente) {
+            views.jTabbedPane1.setSelectedIndex(1);
+            limpiarTable();
+            listarClienter();
         }
         else {
             limpiar();

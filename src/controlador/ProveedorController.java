@@ -57,6 +57,7 @@ public class ProveedorController implements ActionListener, MouseListener, KeyLi
         this.views.JMenuEliminarProv.addActionListener(this);
         this.views.JMenuReingresarProv.addActionListener(this);
         this.views.jMenuEditarProv.addActionListener(this);
+        this.views.jMenuProveedor.addActionListener(this);
         llenarProveedor();   
         AutoCompleteDecorator.decorate(productoNuevo.cbxProveedorPr);
         AutoCompleteDecorator.decorate(views.cbxProvNC);
@@ -152,6 +153,10 @@ public class ProveedorController implements ActionListener, MouseListener, KeyLi
                     JOptionPane.showMessageDialog(null, "Error al reingresar proveedor", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             } 
+        } else if (e.getSource() == views.jMenuProveedor) {
+            views.jTabbedPane1.setSelectedIndex(2);
+            limpiarTable();
+            listarProveedores();
         } else {
             limpiar();
         }

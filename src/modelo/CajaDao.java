@@ -117,8 +117,8 @@ public class CajaDao {
     }
      
    // Listar apertura
-      // Listar cajas
-    public List ListarAperturas(String valor) {
+       // Listar cajas
+      public List ListarAperturas(String valor) {
         List<AperturaCierre> lista = new ArrayList();
         try {
             con = cn.getConexion();
@@ -146,23 +146,66 @@ public class CajaDao {
         return lista;
     }
     
-     // Monto final para cerra caja
-    public double montoFinal(int id_user) {
-        double monto = 0.00;
-        String sql = "SELECT SUM(total) AS monto_total FROM ventas WHERE id_user = ?";
-        try {
-            con = cn.getConexion();
-            ps = con.prepareStatement(sql);
-            ps.setInt(1, 1);
-            rs = ps.executeQuery();
-            if (rs.next()) {
-                monto = rs.getDouble("monto_total");
-            }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, e.toString());
+    
+    
+    
+    
+     public double montoFinal(int id_user) {
+    double montoInicial = 0.00;
+    double ventasTotales = 0.00;
+    String fechaApertura = "";
+
+    // Obtener el monto inicial y la fecha de apertura
+    String sqlMontoInicial = "SELECT monto_inicial, fecha_apertura FROM detalle_cajas WHERE id_user = ? AND estado = 1";
+    try {
+        con = cn.getConexion();
+        ps = con.prepareStatement(sqlMontoInicial);
+        ps.setInt(1, id_user);
+        rs = ps.executeQuery();
+        if (rs.next()) {
+            montoInicial = rs.getDouble("monto_inicial");
+            fechaApertura = rs.getString("fecha_apertura");
         }
-        return monto;
+        rs.close();
+        ps.close();
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, e.toString());
     }
+
+    // Mostrar el monto inicial y la fecha de apertura
+    System.out.println("Monto Inicial: " + montoInicial);
+    System.out.println("Fecha Apertura: " + fechaApertura);
+
+    // Obtener las ventas totales desde la fecha de apertura
+    String sqlVentas = "SELECT SUM(total) AS monto_total FROM ventas WHERE id_user = ? AND fecha >= ?";
+    try {
+        ps = con.prepareStatement(sqlVentas);
+        ps.setInt(1, id_user);
+        ps.setString(2, fechaApertura);
+        rs = ps.executeQuery();
+        if (rs.next()) {
+            ventasTotales = rs.getDouble("monto_total");
+        }
+        rs.close();
+        ps.close();
+         } catch (SQLException e) {
+             JOptionPane.showMessageDialog(null, e.toString());
+         }
+
+         // Calcular monto final
+         double montoFinal = montoInicial + ventasTotales;
+
+// Crear el mensaje combinado
+         String mensaje = "Ventas Totales: " + ventasTotales + "\nMonto final calculado: " + montoFinal;
+
+// Mostrar el mensaje combinado
+         JOptionPane.showMessageDialog(null, mensaje);
+
+         return montoFinal;
+}
+
+
+
     
     // Cerrar con el total de ventas
     public int totalVentas(int id_user) {
@@ -184,24 +227,23 @@ public class CajaDao {
     
     
     
-     public boolean cerrarCaja(AperturaCierre apertura) {
-       String sql = "UPDATE detalle_cajas SET fecha_cierre = ?, monto_final = ?, total_ventas = ?, estado = ? WHERE id_user = ? AND estado = ?";
-       try {
-           con = cn.getConexion();
-           ps = con.prepareStatement(sql);
-           ps.setString(1, apertura.getFecha_cierre());
-           ps.setDouble(2, apertura.getMonto_final());
-           ps.setDouble(3, apertura.getTotal_ventas());
-           ps.setDouble(4, 0);
-           ps.setDouble(5, apertura.getId_usuario());
-           ps.setDouble(6, 1);
-           ps.execute();
-           return true;
-       } catch (SQLException e) {
-           JOptionPane.showMessageDialog(null, e.toString());
-           return false;
-        }
-   }
+     // Método para cerrar caja
+public boolean cerrarCaja(AperturaCierre apertura) {
+    String sql = "UPDATE detalle_cajas SET fecha_cierre = ?, monto_final = ?, total_ventas = ?, estado = 0 WHERE id_user = ? AND estado = 1";
+    try {
+        con = cn.getConexion();
+        ps = con.prepareStatement(sql);
+        ps.setString(1, apertura.getFecha_cierre());
+        ps.setDouble(2, apertura.getMonto_final());
+        ps.setInt(3, apertura.getTotal_ventas());
+        ps.setInt(4, apertura.getId_usuario());
+        ps.execute();
+        return true;
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, e.toString());
+        return false;
+    }
+}
      
    // Metodo para verificar si la caja esta cerrada
       // Método para verificar si la caja ya está cerrada

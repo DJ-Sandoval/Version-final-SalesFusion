@@ -20,6 +20,7 @@ import modelo.Tables;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import vista.PanelAdmin;
 import controlador.CajasController;
+import java.util.Date;
 import modelo.AperturaCierre;
 import modelo.CajaDao;
 import modelo.Cajas;
@@ -31,7 +32,8 @@ import vista.FrmNuevaCategoria;
 import vista.FrmNuevoUsuario;
 import vista.frmNuevoProducto;
 import vista.FrmAperturaCaja;
-
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 /**
  *
  * @author Jose
@@ -286,88 +288,62 @@ public class CajasController implements ActionListener, MouseListener, KeyListen
         }
     }
     
-    // Apertura y cierre
-     private void abrirCaja() {
-        if (apC.txtMontoInicial.getText().equals("")) {
-            JOptionPane.showMessageDialog(null, "Ingrese el monto a iniciar", "Información", JOptionPane.INFORMATION_MESSAGE);
+    // Método para abrir caja
+private void abrirCaja() {
+    if (apC.txtMontoInicial.getText().equals("")) {
+        JOptionPane.showMessageDialog(null, "Ingrese el monto a iniciar", "Información", JOptionPane.INFORMATION_MESSAGE);
+    } else {
+        double monto_inicial = Double.parseDouble(apC.txtMontoInicial.getText());
+        int id_usuario = Integer.parseInt(views.txtIdUsuario.getText());
+        String resultado = cjDao.abrirCaja(monto_inicial, id_usuario);
+        if ("existe".equalsIgnoreCase(resultado)) {
+            JOptionPane.showMessageDialog(null, "La caja ya está abierta");
+            apC.dispose();
+        } else if ("registrado".equalsIgnoreCase(resultado)) {
+            limpiarTable();
+            listarAperturas();
+            NuevoApertura();
+            JOptionPane.showMessageDialog(null, "Caja abierta");
+            apC.dispose();
+            apC.txtMontoInicial.setText("");
         } else {
-            double monto_inicial = Double.parseDouble(apC.txtMontoInicial.getText());
-            int id_usuario = Integer.parseInt(views.txtIdUsuario.getText());
-            String resultado = cjDao.abrirCaja(monto_inicial, id_usuario);
-            if ("existe".equalsIgnoreCase(resultado)) {
-                JOptionPane.showMessageDialog(null, "La caja ya esta abierta");
-                apC.dispose();
-            } else if ("registrado".equalsIgnoreCase(resultado)) {
-                limpiarTable();
-                listarAperturas();
-                NuevoApertura();
-                JOptionPane.showMessageDialog(null, "Caja abierta");
-                apC.dispose();
-                apC.txtMontoInicial.setText("");
-            } else {
-                JOptionPane.showMessageDialog(null, "Error al abrir la caja", "Error", JOptionPane.ERROR_MESSAGE);
-            }
+            JOptionPane.showMessageDialog(null, "Error al abrir la caja", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-     
-    // Cerrar Caja
-    /*
+}
+
+  
     public void cerrarCaja() {
         int pregunta = JOptionPane.showConfirmDialog(null, "¿Está seguro que desea cerrar la caja?", "Confirmación", JOptionPane.YES_NO_OPTION);
         if (pregunta == JOptionPane.YES_OPTION) {
             double monto_final = cjDao.montoFinal(Integer.parseInt(views.txtIdUsuario.getText()));
-            System.out.println(monto_final);
             int total_ventas = cjDao.totalVentas(Integer.parseInt(views.txtIdUsuario.getText()));
-            System.out.println(total_ventas);
+
+            // Crear un objeto AperturaCierre con los valores obtenidos
             AperturaCierre aper = new AperturaCierre();
-            aper.setFecha_cierre("2024-07-05 12:39:48");
+            aper.setFecha_cierre(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
             aper.setMonto_final(monto_final);
             aper.setTotal_ventas(total_ventas);
             aper.setId_usuario(Integer.parseInt(views.txtIdUsuario.getText()));
+
             if (cjDao.cerrarCaja(aper)) {
                 JOptionPane.showMessageDialog(null, "Caja cerrada");
                 limpiarTable();
                 listarAperturas();
             } else {
-                JOptionPane.showMessageDialog(null, "Error al cerra la caja");
+                JOptionPane.showMessageDialog(null, "Error al cerrar la caja");
             }
-        } else if (pregunta == JOptionPane.NO_OPTION) {
-            // Si el usuario elige que no no realiza nada
         }
     }
 
-*/
-     
-     
-    public boolean cerrarCaja() {
-    // Verificar si la caja ya está cerrada
-    boolean cajaCerrada = cjDao.verificarCajaCerrada(Integer.parseInt(views.txtIdUsuario.getText()));
-    if (cajaCerrada) {
-        JOptionPane.showMessageDialog(null, "La caja ya está cerrada.");
-        return true;
-    }
     
-    int pregunta = JOptionPane.showConfirmDialog(null, "¿Está seguro que desea cerrar la caja?", "Confirmación", JOptionPane.YES_NO_OPTION);
-    if (pregunta == JOptionPane.YES_OPTION) {
-        double monto_final = cjDao.montoFinal(Integer.parseInt(views.txtIdUsuario.getText()));
-        int total_ventas = cjDao.totalVentas(Integer.parseInt(views.txtIdUsuario.getText()));
-        AperturaCierre aper = new AperturaCierre();
-        aper.setFecha_cierre("2024-07-05 12:39:48");
-        aper.setMonto_final(monto_final);
-        aper.setTotal_ventas(total_ventas);
-        aper.setId_usuario(Integer.parseInt(views.txtIdUsuario.getText()));
-        if (cjDao.cerrarCaja(aper)) {
-            JOptionPane.showMessageDialog(null, "Caja cerrada");
-            limpiarTable();
-            listarAperturas();
-            return true;
-        } else {
-            JOptionPane.showMessageDialog(null, "Error al cerrar la caja");
-            return false;
-        }
-    }
-    return false; // Si el usuario selecciona NO
-}
+
+
+     
+       
+     
+     
+ 
 
      
      private void NuevoApertura() {
@@ -375,23 +351,24 @@ public class CajasController implements ActionListener, MouseListener, KeyListen
      }
      
      public void listarAperturas() {
-        Tables color = new Tables();
-        views.TableApertura.setDefaultRenderer(views.TableApertura.getColumnClass(0), color);
-        List<AperturaCierre> lista = cjDao.ListarAperturas(views.txtBuscarApertura.getText());
-        modelo = (DefaultTableModel) views.TableApertura.getModel();
-        Object[] ob = new Object[6];
-        for (int i = 0; i < lista.size(); i++) {
-            ob[0] = lista.get(i).getFecha_apertura();
-            ob[1] = lista.get(i).getFecha_cierre();
-            ob[2] = lista.get(i).getMonto_inicial();
-            ob[3] = lista.get(i).getMonto_final();
-            ob[4] = lista.get(i).getTotal_ventas();
-            ob[5] = lista.get(i).getNombre_usuario();
-            modelo.addRow(ob);
-        }
-        // Establecer modelo a tabla
-        views.TableCaja.setModel(modelo);
-     }
+    Tables color = new Tables();
+    views.TableApertura.setDefaultRenderer(views.TableApertura.getColumnClass(0), color);
+    List<AperturaCierre> lista = cjDao.ListarAperturas(views.txtBuscarApertura.getText());
+    DefaultTableModel modelo = (DefaultTableModel) views.TableApertura.getModel();
+    modelo.setRowCount(0); // Limpiar la tabla antes de añadir los nuevos datos
+    Object[] ob = new Object[6];
+    for (AperturaCierre apertura : lista) {
+        ob[0] = apertura.getFecha_apertura();
+        ob[1] = apertura.getFecha_cierre();
+        ob[2] = apertura.getMonto_inicial();
+        ob[3] = apertura.getMonto_final();
+        ob[4] = apertura.getTotal_ventas();
+        ob[5] = apertura.getNombre_usuario();
+        modelo.addRow(ob);
+    }
+    // Establecer modelo a tabla
+    views.TableApertura.setModel(modelo);
+}
      
      
      

@@ -92,6 +92,7 @@ public class ProductosController implements ActionListener, MouseListener, KeyLi
         this.views.txtCantNV.addKeyListener(this);
         this.views.txtPagarCon.addKeyListener(this);
         this.views.txtBuscarProducto.addKeyListener(this);
+        this.views.jMenuProducto.addActionListener(this);
         //proDao.generarReporte(1);
         listarProductos();
         llenarProveedor();
@@ -180,6 +181,10 @@ public class ProductosController implements ActionListener, MouseListener, KeyLi
                     JOptionPane.showMessageDialog(null, "Error al eliminar producto");
                 }
             }
+        } else if (e.getSource() == views.jMenuProducto) {
+            views.jTabbedPane1.setSelectedIndex(0);
+            limpiarTable();
+            listarProductos();
         } else if (e.getSource() == views.jMenuIEditarProd) {
             if (views.txtIdProducto.getText().equals("")) {
                 JOptionPane.showMessageDialog(null, "Seleccione una fila para reingresar", "campo vacio", JOptionPane.INFORMATION_MESSAGE);
